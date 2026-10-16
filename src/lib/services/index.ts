@@ -8,3 +8,4 @@ export { notificationService } from "./notificationService";
 export { settingsService } from "./settingsService";
 export { storageService } from "./storageService";
 export { fcmService } from "./fcmService";
+export { campaignService } from "./campaignService";

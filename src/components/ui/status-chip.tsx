@@ -10,14 +10,21 @@ export function StatusChip({ status, className }: StatusChipProps) {
   const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium border";
 
   const colorStyles: Record<AppointmentStatus, string> = {
-    pending: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
-    confirmed: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
-    checked_in: "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
-    in_service: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
-    completed: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
-    cancelled: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
-    rejected: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
-    no_show: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
+    pending: "bg-[#FBF3E6] text-[#8C6527] border-[#EFE0CA]",
+    confirmed: "bg-[#F0EBE3] text-[#302A24] border-[#E9E1D6]",
+    checked_in: "bg-[#F0EBE3] text-[#A27C48] border-[#DDCFBA]",
+    in_service: "bg-[#F0EBE3] text-[#876438] border-[#DDCFBA] font-semibold",
+    completed: "bg-[#E0EBDD] text-[#355B3C] border-[#C7DCC2]",
+    cancelled: "bg-[#F7E7E3] text-[#8C3930] border-[#EAC8C1]",
+    rejected: "bg-[#F7E7E3] text-[#8C3930] border-[#EAC8C1]",
+    no_show: "bg-[#F0EBE3] text-[#74695E] border-[#E9E1D6]",
+    Booked: "bg-[#FBF3E6] text-[#8C6527] border-[#EFE0CA]",
+    Confirmed: "bg-[#F0EBE3] text-[#302A24] border-[#E9E1D6]",
+    "In Progress": "bg-[#F0EBE3] text-[#876438] border-[#DDCFBA] font-semibold",
+    Completed: "bg-[#E0EBDD] text-[#355B3C] border-[#C7DCC2]",
+    Cancelled: "bg-[#F7E7E3] text-[#8C3930] border-[#EAC8C1]",
+    "No Show": "bg-[#F0EBE3] text-[#74695E] border-[#E9E1D6]",
+    Rescheduled: "bg-[#F0EBE3] text-[#74695E] border-[#E9E1D6]",
   };
 
   return (

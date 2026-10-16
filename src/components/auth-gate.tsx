@@ -2,33 +2,11 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { useData } from "@/lib/store";
 import { FCMProvider } from "@/components/fcm-provider";
+import { SalonFullScreenLoader } from "@/components/ui/salon-loader";
 
 const AUTH_ROUTES = ["/login", "/register"];
-
-function Splash() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col items-center gap-4"
-      >
-        <img src="/icons/icon-192.png" alt="Glow & Glamour" className="h-24 w-24 object-contain drop-shadow-sm" />
-        <div className="font-display text-2xl font-semibold tracking-tight text-primary">
-          Glow &amp; Glamour
-        </div>
-      </motion.div>
-      <div className="relative h-1.5 w-40 overflow-hidden rounded-full bg-muted">
-        <div className="animate-shimmer absolute inset-0 rounded-full bg-primary/40" />
-      </div>
-      <p className="text-xs text-muted-foreground">Preparing your salon experience…</p>
-    </div>
-  );
-}
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { ready, currentUser } = useData();
@@ -36,24 +14,46 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
-  const isProtected = pathname.startsWith("/customer") || pathname.startsWith("/staff") || pathname.startsWith("/owner");
+  const isProtected =
+    pathname.startsWith("/customer") ||
+    pathname.startsWith("/staff") ||
+    pathname.startsWith("/owner") ||
+    pathname.startsWith("/developer");
 
   useEffect(() => {
     if (!ready) return;
     if (!currentUser && isProtected) {
       router.replace("/login");
-    } else if (currentUser && (isAuthRoute || pathname === "/")) {
+    } else if (currentUser && pathname.startsWith("/developer") && currentUser.role !== "developer") {
+      router.replace(`/${currentUser.role || "customer"}`);
+    } else if (currentUser && isAuthRoute) {
       const targetRole = currentUser.role || "customer";
       router.replace(`/${targetRole}`);
     }
   }, [ready, currentUser, isProtected, isAuthRoute, pathname, router]);
 
-  if (!ready) return <Splash />;
+  // Genuine initial loading state only when needed (e.g., verifying protected route session or auth route)
+  if (!ready && (isProtected || isAuthRoute)) {
+    return <SalonFullScreenLoader message="Checking your session..." />;
+  }
 
-  if (!currentUser && isProtected) return <Splash />;
-  if (currentUser && (isAuthRoute || pathname === "/")) return <Splash />;
+  if (!currentUser && isProtected) {
+    return <SalonFullScreenLoader message="Redirecting to sign in..." />;
+  }
 
-  const themeClass = currentUser ? `theme-${currentUser.role}` : "theme-customer";
+  if (currentUser && isAuthRoute) {
+    return <SalonFullScreenLoader message="Signing you in..." />;
+  }
+
+  // Only apply internal portal themes (owner, staff, developer) when browsing internal routes.
+  // Public pages and customer pages always use the signature warm ivory theme.
+  const isInternalPortal =
+    pathname.startsWith("/owner") ||
+    pathname.startsWith("/staff") ||
+    pathname.startsWith("/developer");
+
+  const themeClass =
+    currentUser && isInternalPortal ? `theme-${currentUser.role}` : "theme-customer";
 
   return (
     <div className={themeClass}>

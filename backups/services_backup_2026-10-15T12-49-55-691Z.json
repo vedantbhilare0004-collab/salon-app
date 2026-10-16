@@ -1,0 +1,757 @@
+[
+  {
+    "id": "0HenVyB58r6sKFmvEcIf",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "GLOBAL HIGHLIGHTS (10-12 Strip)",
+    "price": 1999,
+    "durationMin": 120,
+    "active": true
+  },
+  {
+    "id": "0KQO7O1FyR7QJjVWZrgD",
+    "category": "Male",
+    "name": "BEARD TRIM",
+    "durationMin": 15,
+    "active": true,
+    "branchId": "koregaon",
+    "price": 40
+  },
+  {
+    "id": "0WmUe0BISb6girlTqUOJ",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "HIGHLIGHTS (PER STRIP)",
+    "price": 200,
+    "durationMin": 15,
+    "active": true
+  },
+  {
+    "id": "1Tx7LKRMPKNfdoJSnDOb",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "HAIR CUT + GLOBAL COLOUR + SPA",
+    "price": 2499,
+    "durationMin": 150,
+    "active": true
+  },
+  {
+    "id": "2NgpjNSQcQquQtJD4C54",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "IRONING",
+    "durationMin": 30,
+    "active": true,
+    "price": 499
+  },
+  {
+    "id": "2vGRykdfrpmWTb6vATSU",
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 80,
+    "category": "FACIAL SKIN",
+    "name": "LGS GOLD",
+    "price": 799
+  },
+  {
+    "id": "3cSELk0nSHdPoha0u9tI",
+    "branchId": "koregaon",
+    "category": "Male",
+    "name": "SHAVING",
+    "price": 69,
+    "durationMin": 20,
+    "active": true
+  },
+  {
+    "id": "3mMZxI92mjofR7OeLQKk",
+    "branchId": "koregaon",
+    "category": "Male",
+    "name": "HAIR CUT + GLOBAL COLOUR + SPA (Male)",
+    "price": 1099,
+    "durationMin": 90,
+    "active": true
+  },
+  {
+    "id": "3noytL4lebDrPEnhoead",
+    "category": "D-TAN",
+    "durationMin": 30,
+    "active": true,
+    "name": "O3+",
+    "branchId": "koregaon",
+    "price": 450
+  },
+  {
+    "id": "4F1qaiFdppKT9SF8FO71",
+    "durationMin": 30,
+    "category": "WAXING",
+    "name": "FULL BODY RICA",
+    "price": 2500,
+    "branchId": "koregaon",
+    "active": true
+  },
+  {
+    "id": "4VE01C0NJ5us64ZrSaZ8",
+    "branchId": "koregaon",
+    "category": "Female",
+    "active": true,
+    "name": "LOREAL TREATMENT SPA",
+    "durationMin": 60,
+    "price": 899
+  },
+  {
+    "id": "4b5lcOP6vxigLDdauh2p",
+    "active": true,
+    "category": "Treatment SKIN",
+    "price": 200,
+    "durationMin": 30,
+    "branchId": "koregaon",
+    "name": "SKIN ANLICE"
+  },
+  {
+    "id": "4hQ8yQW9wAPUANVqOi3s",
+    "category": "HAND&FEET",
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "price": 200,
+    "name": "FOOT SCRUB",
+    "active": true
+  },
+  {
+    "id": "4qDEMSv3yiP6kokOMBW0",
+    "name": "BOTOX TREATMENT",
+    "price": 5500,
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 120,
+    "category": "Treatment HAIR STRET"
+  },
+  {
+    "id": "53xNqvSjvMO2ZAIp9AnD",
+    "branchId": "koregaon",
+    "category": "Hair CUTTING FEMALE",
+    "name": "U CUT",
+    "price": 350,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "5Baz7TqSNqmildopVcca",
+    "branchId": "koregaon",
+    "category": "Male",
+    "name": "GLOBAL COLOR (Male)",
+    "price": 599,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "5FikgXLpP4pMCgfeNcyH",
+    "branchId": "koregaon",
+    "category": "Male",
+    "name": "KERATIN AQUA SPA",
+    "durationMin": 60,
+    "active": true,
+    "price": 499
+  },
+  {
+    "id": "5k4n3IkcOLcap5cNfLRf",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "ILLUMINAGE BALAYAGE / OMBRE",
+    "price": 2999,
+    "durationMin": 180,
+    "active": true
+  },
+  {
+    "id": "5mPDUtQ6ExKhkUAiW72b",
+    "name": "ADVANS GOLD FACIAL",
+    "category": "FACIAL SKIN",
+    "price": 850,
+    "branchId": "koregaon",
+    "active": true,
+    "durationMin": 80
+  },
+  {
+    "id": "65eOXHKfwMCL17HyazzB",
+    "category": "Male",
+    "active": true,
+    "durationMin": 60,
+    "branchId": "koregaon",
+    "price": 200,
+    "name": "HAIR CUT +HAIR WASH +STYLING"
+  },
+  {
+    "id": "6FKsTEjw1Kn4bB7GR3Go",
+    "active": true,
+    "branchId": "koregaon",
+    "price": 500,
+    "durationMin": 30,
+    "category": "WAXING",
+    "name": "FULL LEG NORMAL HALF - 250"
+  },
+  {
+    "id": "703HSrkuHSc6lAWUsvf4",
+    "branchId": "koregaon",
+    "category": "Female",
+    "name": "HAIR WASH + BLOWDRY",
+    "price": 250,
+    "durationMin": 30,
+    "active": true
+  },
+  {
+    "id": "7rQkJ5t8bljmL3L8zLRn",
+    "branchId": "koregaon",
+    "category": "SHEET MASK",
+    "name": "MIDIUM",
+    "price": 100,
+    "durationMin": 15,
+    "active": true
+  },
+  {
+    "id": "7u6D7MZBkEOXMHgF26Yz",
+    "branchId": "koregaon",
+    "durationMin": 20,
+    "category": "SHEET MASK",
+    "price": 200,
+    "name": "VETAMIN C",
+    "active": true
+  },
+  {
+    "id": "8LgpbjX6QIFF6bwNKSTx",
+    "durationMin": 180,
+    "name": "O3+ GLOWING SKIN",
+    "price": 2199,
+    "category": "FACIAL SKIN",
+    "active": true,
+    "branchId": "koregaon"
+  },
+  {
+    "id": "9mvyas1GVF67nsgG6Iij",
+    "branchId": "koregaon",
+    "category": "WAXING",
+    "name": "HALF HAND RICA",
+    "durationMin": 200,
+    "active": true,
+    "price": 500
+  },
+  {
+    "id": "A6q1nDHFMlB98RSksnLN",
+    "category": "Treatment SKIN",
+    "price": 1499,
+    "branchId": "koregaon",
+    "active": true,
+    "durationMin": 60,
+    "name": "HAYDRA FACIAL HAYDRA[MALE]"
+  },
+  {
+    "id": "BElobNoFvC8vshIQYtYW",
+    "category": "Hair CUTTING FEMALE",
+    "active": true,
+    "durationMin": 30,
+    "name": "HAIR TRIMMING",
+    "branchId": "koregaon",
+    "price": 150
+  },
+  {
+    "id": "Bi5NDqh4Ngb10Ni5SDNm",
+    "category": "FACIAL SKIN",
+    "name": "LGS SKIN WHITNIG",
+    "branchId": "koregaon",
+    "active": true,
+    "durationMin": 80,
+    "price": 799
+  },
+  {
+    "id": "Bt2ROdKEKY2RIR6Hdi3l",
+    "branchId": "koregaon",
+    "category": "Treatment SKIN",
+    "name": "SKIN ANLIYES",
+    "price": 150,
+    "durationMin": 15,
+    "active": true
+  },
+  {
+    "id": "CIf5aK1zZL2cli4BgjIV",
+    "branchId": "koregaon",
+    "category": "CLEANUP",
+    "name": "LGS GOLD",
+    "durationMin": 40,
+    "active": true,
+    "price": 250
+  },
+  {
+    "id": "CZP4lUfdJB94rZn9jBM4",
+    "name": "MANICURE",
+    "category": "HAND&FEET",
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "active": true,
+    "price": 500
+  },
+  {
+    "id": "Ghfb68z9iIzPBcDlQIeM",
+    "name": "AROMA CLEANUP",
+    "durationMin": 30,
+    "active": true,
+    "branchId": "koregaon",
+    "category": "CLEANUP",
+    "price": 250
+  },
+  {
+    "id": "GyX7IosNuvS36CfNfc0q",
+    "branchId": "koregaon",
+    "category": "Treatment SKIN",
+    "name": "ANTI DANDRUF HIGH FRCVECY",
+    "price": 499,
+    "durationMin": 30,
+    "active": true
+  },
+  {
+    "id": "IRWf6DuQfqBrxG7MZTth",
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "name": "RAGA",
+    "category": "D-TAN",
+    "price": 350
+  },
+  {
+    "id": "JTU9F5XqXnIe7lVTZVsI",
+    "durationMin": 30,
+    "branchId": "koregaon",
+    "price": 1000,
+    "category": "WAXING",
+    "active": true,
+    "name": "FULL LEG RICA"
+  },
+  {
+    "id": "L2HMSuXdfSmWdadGiPr9",
+    "branchId": "koregaon",
+    "name": "NATURE[FRUTE]",
+    "durationMin": 60,
+    "category": "FACIAL SKIN",
+    "active": true,
+    "price": 500
+  },
+  {
+    "id": "L9MyCpdoV0I3jkFMHby8",
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "category": "WAXING",
+    "name": "UNDERARMS RICA",
+    "active": true,
+    "price": 100
+  },
+  {
+    "id": "MdJPiiCLfcGByrEUZu7E",
+    "branchId": "koregaon",
+    "name": "HEAD MASSAGE [10 MIN]",
+    "category": "HEAD MASSAGE",
+    "durationMin": 10,
+    "price": 200,
+    "active": true
+  },
+  {
+    "id": "O8sztgLrfIuYDk15J6ai",
+    "name": "PERAL CLEANUP",
+    "durationMin": 30,
+    "category": "CLEANUP",
+    "branchId": "koregaon",
+    "active": true,
+    "price": 300
+  },
+  {
+    "id": "PEJJpYgkF1s1pLw6EZWB",
+    "category": "FACIAL SKIN",
+    "price": 500,
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 60,
+    "name": "NATURE[PAPPYA]"
+  },
+  {
+    "id": "PduRiCF2HPMTbvRP6tBl",
+    "price": 200,
+    "durationMin": 30,
+    "branchId": "koregaon",
+    "name": "FULL FACE NORMAL",
+    "category": "WAXING",
+    "active": true
+  },
+  {
+    "id": "QBrCVXZwMOj1E2Dl33OZ",
+    "active": true,
+    "branchId": "koregaon",
+    "price": 500,
+    "durationMin": 30,
+    "category": "WAXING",
+    "name": "HALF LEG RICA"
+  },
+  {
+    "id": "QF8EYuHlSwk0lIosIGE0",
+    "category": "Hair CUTTING FEMALE",
+    "branchId": "koregaon",
+    "name": "LAYER CUT",
+    "active": true,
+    "durationMin": 60,
+    "price": 450
+  },
+  {
+    "id": "QHJYDTFONJjtpzPPAMAr",
+    "branchId": "koregaon",
+    "category": "Hair CUTTING FEMALE",
+    "name": "V CUT",
+    "price": 350,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "R4rV8zldo1alWkpwRMEg",
+    "branchId": "koregaon",
+    "category": "WAXING",
+    "name": "FULL HAND RICA",
+    "durationMin": 40,
+    "active": true,
+    "price": 1000
+  },
+  {
+    "id": "RXEM170nfCR22XN5jRtx",
+    "name": "LOREAL GLOBAL COLOR[AMMONIA FREE] FEMALE",
+    "active": true,
+    "durationMin": 40,
+    "category": "Color",
+    "price": 3000,
+    "branchId": "koregaon"
+  },
+  {
+    "id": "S7Ra6pxBgFgJwg1Tz4it",
+    "branchId": "koregaon",
+    "category": "Treatment SKIN",
+    "name": "HAYDRA FACIAL HAYDRA[FEMALE]",
+    "price": 1600,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "SO00KE3d4AIkzqX64KyA",
+    "name": "NANOPLASTIA",
+    "durationMin": 120,
+    "branchId": "koregaon",
+    "active": true,
+    "price": 5500,
+    "category": "Treatment HAIR STRET"
+  },
+  {
+    "id": "SsBqW1QQ7J6edfBtUrt3",
+    "branchId": "koregaon",
+    "active": true,
+    "name": "NISHA HAIR GEL MALE",
+    "durationMin": 30,
+    "category": "Color",
+    "price": 200
+  },
+  {
+    "id": "Up5yIrQPBtFD4htRN9Cu",
+    "branchId": "koregaon",
+    "category": "CLEANUP",
+    "name": "LGS WHITING",
+    "price": 300,
+    "durationMin": 30,
+    "active": true
+  },
+  {
+    "id": "VLNqzEN2MiEEfmtchpNR",
+    "branchId": "koregaon",
+    "category": "Hair CUTTING FEMALE",
+    "name": "ONE LENGHT",
+    "durationMin": 60,
+    "active": true,
+    "price": 350
+  },
+  {
+    "id": "WBgBJAieoAHJsRvshju6",
+    "branchId": "koregaon",
+    "category": "CURLYY TRETMENT",
+    "name": "ONLY FOR HEAD",
+    "price": 1500,
+    "durationMin": 120,
+    "active": true
+  },
+  {
+    "id": "WvknQiEpebbM4elPoM8P",
+    "category": "HAND&FEET",
+    "name": "HAND SCRUB",
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "price": 200
+  },
+  {
+    "id": "Xh78XOzSsYj161QHJwfq",
+    "branchId": "koregaon",
+    "category": "CLEANUP",
+    "name": "ONLY SCRUB",
+    "price": 150,
+    "durationMin": 10,
+    "active": true
+  },
+  {
+    "id": "YF0CHfoo3Uc39ru34cXX",
+    "branchId": "koregaon",
+    "category": "CURLYY TRETMENT",
+    "name": "FULL HEAD",
+    "durationMin": 120,
+    "active": true,
+    "price": 2000
+  },
+  {
+    "id": "ZQuOyegd7OCVeB78JqEr",
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "name": "UNDERARMS NORMAL",
+    "category": "WAXING",
+    "price": 50
+  },
+  {
+    "id": "aHy7veG96rDVGcwOoKsy",
+    "branchId": "koregaon",
+    "category": "Male",
+    "name": "BEARD",
+    "price": 80,
+    "durationMin": 15,
+    "active": true
+  },
+  {
+    "id": "aqPOi9BKhc9seBniM4pZ",
+    "name": "Keratin Smoothing",
+    "description": "Frizz-free, silky smooth hair lasting up to 3 months.",
+    "price": 200,
+    "duration": 90,
+    "category": "Treatment",
+    "active": true
+  },
+  {
+    "id": "bDslMPrwzreUcRjzEEFx",
+    "durationMin": 60,
+    "category": "Hair CUTTING FEMALE",
+    "name": "BUTTERFLY CUT",
+    "branchId": "koregaon",
+    "active": true,
+    "price": 450
+  },
+  {
+    "id": "bjyBxEWJF2zAldscrIVv",
+    "branchId": "koregaon",
+    "category": "Color",
+    "name": "HIGHLIGHTS[10-12]",
+    "price": 2160,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "dUcfPGVKhZHmJxwX7vE6",
+    "name": "Luxury Blowout",
+    "description": "Wash, scalp massage, and expert styling for any occasion.",
+    "price": 45,
+    "duration": 45,
+    "category": "Styling",
+    "active": true
+  },
+  {
+    "id": "eYRQ09WUHcjYLJAX9Gbm",
+    "durationMin": 120,
+    "name": "KERATIN",
+    "branchId": "koregaon",
+    "active": true,
+    "category": "Treatment HAIR STRET",
+    "price": 5500
+  },
+  {
+    "id": "gfRzeBnRnyGnjtF8dNS1",
+    "name": "Balayage & Color",
+    "description": "Hand-painted highlights for a natural, sun-kissed look.",
+    "price": 150,
+    "duration": 120,
+    "category": "Color"
+  },
+  {
+    "id": "h5romXSQ84ynqbTt76kv",
+    "active": true,
+    "durationMin": 60,
+    "category": "SPA",
+    "name": "LOREAL SPA[AMP]",
+    "price": 799,
+    "branchId": "koregaon"
+  },
+  {
+    "id": "hzjeJxua1hRYztfgIfnG",
+    "active": true,
+    "durationMin": 70,
+    "category": "Female",
+    "name": "5D LICE TR EATMENT",
+    "price": 3999,
+    "branchId": "koregaon"
+  },
+  {
+    "id": "i8f5QVCuG7nsxN5Bd4hd",
+    "branchId": "koregaon",
+    "category": "HAND&FEET",
+    "name": "FULL PEDICURE",
+    "price": 1500,
+    "durationMin": 60,
+    "active": true
+  },
+  {
+    "id": "k5UOaYzXzhf1yrUx5HOB",
+    "category": "Treatment SKIN",
+    "durationMin": 30,
+    "price": 499,
+    "branchId": "koregaon",
+    "active": true,
+    "name": "SKIN CLEAN& REPLENISH THE NUTRITION"
+  },
+  {
+    "id": "k9pjxt8uAXw3P2wmKCAQ",
+    "name": "SMOOTHNIG",
+    "branchId": "koregaon",
+    "active": true,
+    "durationMin": 120,
+    "price": 4000,
+    "category": "Treatment HAIR STRET"
+  },
+  {
+    "id": "kGcX1WwECmAdyGHNMk4k",
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "active": true,
+    "category": "WAXING",
+    "name": "FULL BODY NORMAL",
+    "price": 1500
+  },
+  {
+    "id": "lTwdie5X6f91rnbF3jTn",
+    "branchId": "koregaon",
+    "price": 499,
+    "category": "SPA",
+    "durationMin": 60,
+    "active": true,
+    "name": "KERATIN[SPA] MILLAU"
+  },
+  {
+    "id": "m0fQifGUqYK2270kO1jc",
+    "branchId": "koregaon",
+    "name": "FULL FACE RICA",
+    "durationMin": 30,
+    "active": true,
+    "price": 300,
+    "category": "WAXING"
+  },
+  {
+    "id": "mOceqcWvZ7HnyjKlUacy",
+    "price": 350,
+    "category": "CLEANUP",
+    "durationMin": 30,
+    "name": "GOLD CLEANUP",
+    "active": true,
+    "branchId": "koregaon"
+  },
+  {
+    "id": "mlXRfSvPR779Gzvi5JcK",
+    "name": "LOREAL GLOBAL COLOR[AMMONIA FREE] MALE",
+    "category": "Color",
+    "active": true,
+    "durationMin": 30,
+    "branchId": "koregaon",
+    "price": 399
+  },
+  {
+    "id": "ngW2YG8lGzREVXPaJApP",
+    "branchId": "koregaon",
+    "category": "HAND&FEET",
+    "durationMin": 30,
+    "price": 500,
+    "active": true,
+    "name": "PEDICURE HALF"
+  },
+  {
+    "id": "oWyxtUtf8i5soHKexCC8",
+    "category": "CLEANUP",
+    "active": true,
+    "branchId": "koregaon",
+    "price": 400,
+    "durationMin": 30,
+    "name": "LOTUS CLEANUP"
+  },
+  {
+    "id": "qPMQ67U7lDjdKFhN4ZUD",
+    "durationMin": 60,
+    "active": true,
+    "category": "SPA",
+    "branchId": "koregaon",
+    "price": 799,
+    "name": "WELLA[SPA]"
+  },
+  {
+    "id": "rx3Eez7a8buCx0Xc32ri",
+    "branchId": "koregaon",
+    "category": "Color",
+    "name": "HIGHLIGHT PER STREEP",
+    "price": 200,
+    "durationMin": 15,
+    "active": true
+  },
+  {
+    "id": "sAI2bymbLbPkpJh6bTdL",
+    "price": 4999,
+    "category": "Treatment",
+    "durationMin": 70,
+    "branchId": "koregaon",
+    "active": true,
+    "name": "5D LICE TREATMENT"
+  },
+  {
+    "id": "t0102qxj9ubf1rp3wPPJ",
+    "active": true,
+    "category": "HEAD MASSAGE",
+    "branchId": "koregaon",
+    "price": 300,
+    "name": "SPECIAL RELAXING MASSAGE[30 MIN]",
+    "durationMin": 30
+  },
+  {
+    "id": "uNuT5sK9WdrpZEXfaNjU",
+    "price": 250,
+    "active": true,
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "name": "HALF LEG NORMAL",
+    "category": "WAXING"
+  },
+  {
+    "id": "yyESLueaodwo0Na9aVys",
+    "name": "Signature Haircut",
+    "branchId": "koregaon",
+    "durationMin": 40,
+    "active": true,
+    "category": "Hair CUTTING FEMALE",
+    "price": 450
+  },
+  {
+    "id": "zVQ4fd5X9YvuXyIIO8IV",
+    "branchId": "koregaon",
+    "durationMin": 30,
+    "active": true,
+    "name": "FRUIT CLEANUP",
+    "category": "CLEANUP",
+    "price": 250
+  },
+  {
+    "id": "zfqd3G2OtQqJSoJviJFh",
+    "branchId": "koregaon",
+    "active": true,
+    "durationMin": 20,
+    "category": "D-TAN",
+    "name": "RAGA OXYGLOW",
+    "price": 300
+  }
+]

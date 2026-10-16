@@ -16,17 +16,13 @@ function toNotification(id: string, data: Record<string, unknown>): AppNotificat
 }
 
 export const notificationService = {
-  async deleteMultiple(ids: string[]) {
-    const db = getDb();
-    const { deleteDoc } = await import("firebase/firestore");
-    await Promise.all(ids.map((id) => deleteDoc(doc(db, "notifications", id))));
+  async deleteMultiple(_ids: string[]) {
+    // In-app notifications removed.
   },
-  async delete(id: string) {
-    const db = getDb();
-    const { deleteDoc } = await import("firebase/firestore");
-    await deleteDoc(doc(db, "notifications", id));
+  async delete(_id: string) {
+    // In-app notifications removed.
   },
-  async create(input: {
+  async create(_input: {
     recipientId?: string;
     recipientUid?: string;
     audience?: Role;
@@ -35,110 +31,25 @@ export const notificationService = {
     message: string;
     kind: AppNotification["kind"];
   }) {
-    const db = getDb();
-    const docData = {
-      ...input,
-      read: false,
-      createdAt: new Date().toISOString(),
-    } as any;
-    
-    Object.keys(docData).forEach((key) => {
-      if (docData[key] === undefined) {
-        delete docData[key];
-      }
-    });
-
-    await addDoc(collection(db, "notifications"), docData);
-
-    // Auto-trigger an outside-the-app Push Notification
-    if (typeof window !== "undefined") {
-      fetch("/api/notifications/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: input.title,
-          message: input.message,
-          recipientUid: input.recipientUid,
-          audience: input.audience
-        })
-      }).catch((e) => console.error("Failed to trigger push notification", e));
-    }
-
-    try {
-      let q;
-      if (input.recipientUid) {
-        q = query(collection(db, "notifications"), where("recipientUid", "==", input.recipientUid));
-      } else if (input.audience) {
-        q = query(collection(db, "notifications"), where("audience", "==", input.audience));
-      }
-      
-      if (q) {
-        const snap = await getDocs(q);
-        if (snap.docs.length > 30) {
-          const sorted = snap.docs.sort((a, b) => {
-            const dateA = a.data().createdAt || "";
-            const dateB = b.data().createdAt || "";
-            return dateB.localeCompare(dateA); // Newest first
-          });
-          const toDelete = sorted.slice(30);
-          const { deleteDoc } = await import("firebase/firestore");
-          await Promise.all(toDelete.map((d) => deleteDoc(d.ref)));
-        }
-      }
-    } catch (e) {
-      console.warn("Could not prune notifications", e);
-    }
+    // In-app notification feature removed: no need to save in Firestore.
+    return;
   },
 
-  async markRead(id: string) {
-    const db = getDb();
-    await updateDoc(doc(db, "notifications", id), { read: true });
+  async markRead(_id: string) {
+    // In-app notifications removed.
   },
 
-  async markAllRead(recipientId: string) {
-    const db = getDb();
-    const snap = await getDocs(
-      query(collection(db, "notifications"), where("recipientId", "==", recipientId), where("read", "==", false))
-    );
-    await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { read: true })));
+  async markAllRead(_recipientId: string) {
+    // In-app notifications removed.
   },
 
   onNotifications(
-    recipientId: string, // This is actually the uid now
-    role: Role,
+    _recipientId: string,
+    _role: Role,
     cb: (list: AppNotification[]) => void
   ) {
-    const db = getDb();
-    const map = new Map<string, AppNotification>();
-    const emit = () => {
-      const arr = Array.from(map.values()).sort((a, b) =>
-        (b.createdAt || "").localeCompare(a.createdAt || "")
-      );
-      cb(arr);
-    };
-    const unsub1 = onSnapshot(
-      query(collection(db, "notifications"), where("recipientUid", "==", recipientId)),
-      (snap) => {
-        snap.docChanges().forEach((c) => {
-          if (c.type === "removed") map.delete(c.doc.id);
-          else map.set(c.doc.id, toNotification(c.doc.id, c.doc.data() as Record<string, unknown>));
-        });
-        emit();
-      }
-    );
-    const unsub2 = onSnapshot(
-      query(collection(db, "notifications"), where("audience", "==", role)),
-      (snap) => {
-        snap.docChanges().forEach((c) => {
-          if (c.type === "removed") map.delete(c.doc.id);
-          else map.set(c.doc.id, toNotification(c.doc.id, c.doc.data() as Record<string, unknown>));
-        });
-        emit();
-      }
-    );
-    return () => {
-      unsub1();
-      unsub2();
-    };
+    // In-app notifications removed: emit empty list and do not attach Firestore listeners.
+    cb([]);
+    return () => {};
   },
 };

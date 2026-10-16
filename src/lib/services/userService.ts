@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -58,6 +59,41 @@ export const userService = {
       photoURL: "",
       status: "active",
       active: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return userId;
+  },
+
+  async addWalkInClient(input: {
+    fullName: string;
+    phone: string;
+    email?: string;
+    notes?: string;
+    tags?: string[];
+    gender?: string;
+    birthday?: string;
+    preferredBranch?: BranchId;
+  }): Promise<string> {
+    const db = getDb();
+    const userId = await this.generateUniqueUserId();
+    const newDocRef = doc(collection(db, "users"));
+    const now = new Date().toISOString();
+    await setDoc(newDocRef, {
+      uid: newDocRef.id,
+      userId,
+      fullName: input.fullName,
+      phone: input.phone,
+      email: input.email || "",
+      preferredBranch: input.preferredBranch || "koregaon",
+      role: "customer",
+      photoURL: "",
+      status: "active",
+      active: true,
+      notes: input.notes || "",
+      tags: input.tags || ["Walk-in"],
+      gender: input.gender || "",
+      birthday: input.birthday || "",
       createdAt: now,
       updatedAt: now,
     });
@@ -133,11 +169,77 @@ export const userService = {
   },
 
   async toggleStaffActive(userId: string) {
-    const ref = await this.refFor(userId);
-    if (!ref) return;
+    let ref = await this.refFor(userId);
+    if (!ref) {
+      const db = getDb();
+      ref = doc(db, "users", userId);
+    }
     const d = await getDoc(ref);
+    if (!d.exists()) return;
     const active = !(d.data()?.active as boolean);
     await updateDoc(ref, { active, updatedAt: new Date().toISOString() });
+  },
+
+  async createStaffMember(input: {
+    fullName: string;
+    phone: string;
+    email?: string;
+    branch: BranchId;
+    position: string;
+    services?: string[];
+  }): Promise<string> {
+    const db = getDb();
+    const newDocRef = doc(collection(db, "users"));
+    const userId = "STF" + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const now = new Date().toISOString();
+    await setDoc(newDocRef, {
+      uid: newDocRef.id,
+      userId,
+      fullName: input.fullName.trim(),
+      phone: input.phone.trim(),
+      email: input.email?.trim() || "",
+      preferredBranch: input.branch,
+      role: "staff",
+      staffBranch: input.branch,
+      staffPosition: input.position.trim(),
+      staffServices: input.services || [],
+      photoURL: "",
+      status: "active",
+      active: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return userId;
+  },
+
+  async removeStaff(userId: string, deletePermanently = false): Promise<void> {
+    const db = getDb();
+    let ref = await this.refFor(userId);
+    if (!ref) {
+      // Try document ID directly (for mock or seed records like staff_1, staff_2)
+      const directRef = doc(db, "users", userId);
+      const snap = await getDoc(directRef);
+      if (snap.exists()) {
+        ref = directRef;
+      }
+    }
+
+    if (!ref) {
+      console.warn(`[removeStaff] User not found for ID: ${userId}`);
+      return;
+    }
+
+    if (deletePermanently) {
+      await deleteDoc(ref);
+    } else {
+      await updateDoc(ref, {
+        role: "customer",
+        staffPosition: "",
+        staffServices: [],
+        active: true,
+        updatedAt: new Date().toISOString(),
+      });
+    }
   },
 
   async saveFcmToken(uid: string, token: string) {

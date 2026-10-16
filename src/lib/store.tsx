@@ -11,10 +11,12 @@ import {
 } from "react";
 import type {
   Appointment,
+  AppointmentStatus,
   AppNotification,
   Branch,
   BranchId,
   Offer,
+  Campaign,
   QueueEntry,
   LiveQueueEntry,
   Role,
@@ -33,6 +35,7 @@ import { userService } from "./services/userService";
 import { branchService } from "./services/branchService";
 import { serviceService } from "./services/serviceService";
 import { offerService } from "./services/offerService";
+import { campaignService } from "./services/campaignService";
 import { appointmentService } from "./services/appointmentService";
 import { notificationService } from "./services/notificationService";
 import { liveQueueService } from "./services/liveQueueService";
@@ -41,39 +44,12 @@ const AVG_SERVICE_MIN = 30;
 
 export const DEFAULT_BRANCHES: Branch[] = [
   {
-    id: "lhasurane",
-    name: "Lhasurane",
-    tagline: "Neighbourhood elegance, everyday glow.",
-    address: "Shop 4, Lhasurane Main Road, Near City Bank",
-    city: "Lhasurane",
-    phone: "+91 98220 11223",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Glow+and+Glamour+Lhasurane",
-    lat: 19.2183,
-    lng: 72.9781,
-    isOpen: true,
-    availableChairs: 3,
-    totalChairs: 4,
-    openingTime: "09:00",
-    closingTime: "20:00",
-    averageServiceTime: 20,
-    activeStaff: 3,
-    workingHours: [
-      { day: "Mon", open: "09:00", close: "20:00" },
-      { day: "Tue", open: "09:00", close: "20:00" },
-      { day: "Wed", open: "09:00", close: "20:00" },
-      { day: "Thu", open: "09:00", close: "20:00" },
-      { day: "Fri", open: "09:00", close: "20:00" },
-      { day: "Sat", open: "09:00", close: "21:00" },
-      { day: "Sun", open: "10:00", close: "18:00" },
-    ],
-  },
-  {
     id: "koregaon",
     name: "Koregaon",
     tagline: "Full-service beauty & unisex salon.",
-    address: "Plot 12, Koregaon Park Annexe, Lane 7",
+    address: "Glow & Glamour Unisex Salon, Near ZP School, Laxmi Nagar, Koregaon, Maharashtra 415501",
     city: "Koregaon",
-    phone: "+91 98220 44556",
+    phone: "+91 70582 39061",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Glow+and+Glamour+Koregaon",
     lat: 18.5362,
     lng: 73.8923,
@@ -102,6 +78,7 @@ interface DataContextValue {
   branches: Branch[];
   services: Service[];
   offers: Offer[];
+  campaigns: Campaign[];
   appointments: Appointment[];
   queue: Record<string, QueueEntry[]>;
   liveQueue: LiveQueueEntry[];
@@ -135,6 +112,7 @@ interface DataContextValue {
   checkInAppointment: (id: string) => Promise<void>;
   startService: (id: string, staffId?: string) => Promise<void>;
   completeAppointment: (id: string) => Promise<void>;
+  updateAppointmentStatus: (id: string, status: AppointmentStatus) => Promise<void>;
   markNoShow: (id: string) => Promise<void>;
   cancelAppointment: (id: string) => Promise<void>;
   joinWalkIn: (branchId: BranchId, customerName: string, serviceIds: string[]) => Promise<QueueEntry>;
@@ -144,15 +122,29 @@ interface DataContextValue {
     userId: string,
     data: { branch: BranchId; position: string; services: string[] }
   ) => Promise<{ ok: boolean; error?: string }>;
+  createStaffMember: (data: {
+    fullName: string;
+    phone: string;
+    email?: string;
+    branch: BranchId;
+    position: string;
+    services?: string[];
+  }) => Promise<{ ok: boolean; id?: string; error?: string }>;
+  removeStaff: (userId: string, deletePermanently?: boolean) => Promise<void>;
   toggleStaffActive: (userId: string) => Promise<void>;
+  updateUser: (userId: string, patch: Partial<User>) => Promise<void>;
   addService: (s: Omit<Service, "id">) => Promise<void>;
   updateService: (id: string, patch: Partial<Service>) => Promise<void>;
   deleteService: (id: string) => Promise<void>;
   toggleService: (id: string) => Promise<void>;
-  addOffer: (o: Omit<Offer, "id">) => Promise<void>;
+  addOffer: (o: Omit<Offer, "id">) => Promise<string>;
   updateOffer: (id: string, patch: Partial<Offer>) => Promise<void>;
   deleteOffer: (id: string) => Promise<void>;
   toggleOffer: (id: string) => Promise<void>;
+  addCampaign: (c: Omit<Campaign, "id">) => Promise<string>;
+  updateCampaign: (id: string, patch: Partial<Campaign>) => Promise<void>;
+  deleteCampaign: (id: string) => Promise<void>;
+  toggleCampaign: (id: string) => Promise<void>;
   notify: (input: Partial<AppNotification> & { title: string; message: string; kind: AppNotification["kind"] }) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   markAllNotificationsRead: () => Promise<void>;
@@ -165,12 +157,15 @@ interface DataContextValue {
   getOffersFor: (branchId: BranchId) => Offer[];
   getAppointmentsForBranch: (branchId: BranchId) => Appointment[];
   getShopStatus: (branchId: BranchId) => ShopStatus;
+  assignOwner: (targetEmailOrUid: string) => Promise<{ ok: boolean; message?: string; error?: string }>;
+  removeOwner: (targetEmailOrUid: string) => Promise<{ ok: boolean; message?: string; error?: string }>;
+  createOwner: (input: { fullName: string; email: string; phone?: string; password?: string }) => Promise<{ ok: boolean; message?: string; error?: string }>;
 }
 
 const DataContext = createContext<DataContextValue | null>(null);
 
 function deriveQueue(appointments: Appointment[]): Record<string, QueueEntry[]> {
-  const m: Record<string, QueueEntry[]> = { lhasurane: [], koregaon: [] };
+  const m: Record<string, QueueEntry[]> = { koregaon: [] };
   for (const a of appointments) {
     if (a.status === "checked_in" && a.token != null) {
       m[a.branchId].push({
@@ -193,10 +188,11 @@ function deriveQueue(appointments: Appointment[]): Record<string, QueueEntry[]> 
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeBranchId, setActiveBranchId] = useState<BranchId>("lhasurane");
+  const [activeBranchId, setActiveBranchId] = useState<BranchId>("koregaon");
   const [branches, setBranches] = useState<Branch[]>(DEFAULT_BRANCHES);
   const [services, setServices] = useState<Service[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [liveQueue, setLiveQueue] = useState<LiveQueueEntry[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -216,13 +212,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       cleanup();
       if (!fbUser) {
         setCurrentUser(null);
-        setBranches(DEFAULT_BRANCHES);
-        setServices([]);
-        setOffers([]);
         setAppointments([]);
         setLiveQueue([]);
         setNotifications([]);
         setUsers([]);
+
+        // Ensure public data (branches, services, active offers) is populated and cached
+        const publicUnsubs: Array<() => void> = [];
+        try {
+          publicUnsubs.push(branchService.onBranches((b) => setBranches(b.length > 0 ? b : DEFAULT_BRANCHES)));
+          publicUnsubs.push(serviceService.onServices(setServices));
+          publicUnsubs.push(offerService.onOffers(setOffers));
+          publicUnsubs.push(campaignService.onCampaigns(setCampaigns));
+        } catch {
+          /* ignore if offline */
+        }
+        listeners.current = publicUnsubs;
+
         setReady(true);
         return;
       }
@@ -243,7 +249,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             fullName: fbUser.displayName || "User",
             phone: fbUser.phoneNumber || "",
             email: fbUser.email || "",
-            preferredBranch: "lhasurane",
+            preferredBranch: "koregaon",
             role: "customer",
           });
           user = await userService.get(userId);
@@ -254,15 +260,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           setReady(true);
           return;
         }
-        // Auto-promote the designated owner emails
-        const ownerEmailsStr = process.env.NEXT_PUBLIC_OWNER_EMAILS || process.env.NEXT_PUBLIC_OWNER_EMAIL || "";
-        const ownerEmails = ownerEmailsStr.split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
-        const isOwnerEmail = user.email && ownerEmails.includes(user.email.toLowerCase());
+        // Auto-promote designated developer email
+        const developerEmailsStr = process.env.NEXT_PUBLIC_DEVELOPER_EMAILS || "prathmeshbhilare52@gmail.com";
+        const developerEmails = developerEmailsStr.split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+        if (!developerEmails.includes("prathmeshbhilare52@gmail.com")) {
+          developerEmails.push("prathmeshbhilare52@gmail.com");
+        }
+        const isDeveloperEmail = user.email && developerEmails.includes(user.email.toLowerCase());
 
-        if (isOwnerEmail && user.role !== "owner") {
-          await userService.updateUser(user.id, { role: "owner", ownerBranch: "lhasurane" as BranchId });
-          user.role = "owner";
-          user.ownerBranch = "lhasurane";
+        if (isDeveloperEmail && user.role !== "developer") {
+          await userService.updateUser(user.id, { role: "developer", ownerBranch: "koregaon" as BranchId });
+          user.role = "developer";
+          user.ownerBranch = "koregaon";
+        }
+
+        // Auto-promote the designated owner emails (only if not developer)
+        if (!isDeveloperEmail && user.role !== "developer") {
+          const ownerEmailsStr = process.env.NEXT_PUBLIC_OWNER_EMAILS || process.env.NEXT_PUBLIC_OWNER_EMAIL || "";
+          const ownerEmails = ownerEmailsStr.split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+          const isOwnerEmail = user.email && ownerEmails.includes(user.email.toLowerCase());
+
+          if (isOwnerEmail && user.role !== "owner") {
+            await userService.updateUser(user.id, { role: "owner", ownerBranch: "koregaon" as BranchId });
+            user.role = "owner";
+            user.ownerBranch = "koregaon";
+          }
         }
         setCurrentUser(user);
 
@@ -277,7 +299,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setActiveBranchId(
           (user.role === "customer"
             ? user.preferredBranch
-            : (user.staffBranch ?? user.ownerBranch)) ?? "lhasurane"
+            : (user.staffBranch ?? user.ownerBranch)) ?? "koregaon"
         );
         const unsubs: Array<() => void> = [];
         unsubs.push(userService.onUser(fbUser.uid, (updatedUser) => {
@@ -286,6 +308,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         unsubs.push(branchService.onBranches((b) => setBranches(b.length > 0 ? b : DEFAULT_BRANCHES)));
         unsubs.push(serviceService.onServices(setServices));
         unsubs.push(offerService.onOffers(setOffers));
+        unsubs.push(campaignService.onCampaigns(setCampaigns));
         unsubs.push(appointmentService.onAppointments(
           user.role, 
           user.uid, 
@@ -293,7 +316,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           setAppointments
         ));
         unsubs.push(notificationService.onNotifications(user.uid, user.role, setNotifications));
-        if (user.role === "owner") unsubs.push(userService.onUsers(setUsers));
+        if (user.role === "owner" || user.role === "developer") unsubs.push(userService.onUsers(setUsers));
         listeners.current = unsubs;
       } catch (e) {
         console.error("Failed to load user profile:", e);
@@ -538,9 +561,62 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-        if (wasInService) {
-          }
+    try {
+      await notificationService.create({
+        recipientId: a.customerId,
+        recipientUid: a.customerUid,
+        title: "Service Completed",
+        message: `Your appointment on ${a.date} at ${a.time} has been completed. Thank you for visiting Glow & Glamour!`,
+        kind: "booking",
+      });
+    } catch (e) {
+      console.warn("Notification error:", e);
+    }
   }, [appointments, liveQueue]);
+
+  const updateAppointmentStatus = useCallback(
+    async (id: string, status: AppointmentStatus) => {
+      const a = appointments.find((x) => x.id === id);
+      if (!a) return;
+      const now = new Date().toISOString();
+      const patch: Partial<Appointment> = { status };
+      if (status === "completed") {
+        patch.completedAt = now;
+        patch.queueStatus = "completed";
+        patch.token = null;
+      } else if (status === "pending") {
+        patch.completedAt = undefined;
+        patch.queueStatus = "waiting";
+      }
+      await appointmentService.update(id, patch);
+
+      const qEntry = liveQueue.find((q) => q.appointmentId === id);
+      if (qEntry) {
+        await liveQueueService.updateQueueStatus(
+          qEntry.id,
+          status === "completed" ? "completed" : "waiting",
+          {
+            completedTime: status === "completed" ? now : null,
+          }
+        );
+      }
+
+      if (status === "completed") {
+        try {
+          await notificationService.create({
+            recipientId: a.customerId,
+            recipientUid: a.customerUid,
+            title: "Service Completed",
+            message: `Your appointment on ${a.date} has been marked completed. Thank you for visiting Glow & Glamour!`,
+            kind: "booking",
+          });
+        } catch (e) {
+          console.warn("Notification error:", e);
+        }
+      }
+    },
+    [appointments, liveQueue]
+  );
 
   const markNoShow = useCallback(async (id: string) => {
     const a = appointments.find((x) => x.id === id);
@@ -601,7 +677,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         customerName: currentUser?.role === "customer" ? currentUser.fullName : customerName,
         customerPhone: currentUser?.role === "customer" ? currentUser.phone : "—",
         branchId,
-        serviceIds: serviceIds.length ? serviceIds : [branchId === "lhasurane" ? "svc_lh_1" : "svc_ko_1"],
+        serviceIds: serviceIds.length ? serviceIds : ["svc_ko_1"],
         date: todayISO(),
         time: new Date().toTimeString().slice(0, 5),
         status: "checked_in",
@@ -687,9 +763,42 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     [users]
   );
 
+  const createStaffMember = useCallback<DataContextValue["createStaffMember"]>(
+    async (data) => {
+      try {
+        const id = await userService.createStaffMember(data);
+        return { ok: true, id };
+      } catch (err: any) {
+        console.error("Failed to create staff member:", err);
+        return { ok: false, error: err?.message || "Failed to create staff member." };
+      }
+    },
+    []
+  );
+
+  const removeStaff = useCallback<DataContextValue["removeStaff"]>(
+    async (userId: string, deletePermanently = false) => {
+      await userService.removeStaff(userId, deletePermanently);
+    },
+    []
+  );
+
   const toggleStaffActive = useCallback(async (userId: string) => {
     await userService.toggleStaffActive(userId);
   }, []);
+
+  const updateUser = useCallback(
+    async (userId: string, patch: Partial<User>) => {
+      await userService.updateUser(userId, patch);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId || u.uid === userId ? { ...u, ...patch } : u))
+      );
+      if (currentUser && (currentUser.id === userId || currentUser.uid === userId)) {
+        setCurrentUser((prev) => (prev ? { ...prev, ...patch } : null));
+      }
+    },
+    [currentUser]
+  );
 
   const addService = useCallback(async (s: Omit<Service, "id">) => {
     await serviceService.add(s);
@@ -712,7 +821,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addOffer = useCallback(async (o: Omit<Offer, "id">) => {
-    await offerService.add(o);
+    return await offerService.add(o);
   }, []);
 
   const updateOffer = useCallback(async (id: string, patch: Partial<Offer>) => {
@@ -729,6 +838,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       if (o) await offerService.update(id, { active: !o.active });
     },
     [offers]
+  );
+
+  const addCampaign = useCallback(async (c: Omit<Campaign, "id">) => {
+    return await campaignService.add(c);
+  }, []);
+
+  const updateCampaign = useCallback(async (id: string, patch: Partial<Campaign>) => {
+    await campaignService.update(id, patch);
+  }, []);
+
+  const deleteCampaign = useCallback(async (id: string) => {
+    await campaignService.remove(id);
+  }, []);
+
+  const toggleCampaign = useCallback(
+    async (id: string) => {
+      const c = campaigns.find((x) => x.id === id);
+      if (c) await campaignService.update(id, { active: !c.active });
+    },
+    [campaigns]
   );
 
   const notify = useCallback(
@@ -859,6 +988,73 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [ready, appointments, services, completeAppointment]);
 
+  const assignOwner = useCallback(async (targetEmailOrUid: string) => {
+    try {
+      const isEmail = targetEmailOrUid.includes("@");
+      const res = await fetch("/api/developer/owners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "assign",
+          uid: isEmail ? undefined : targetEmailOrUid,
+          email: isEmail ? targetEmailOrUid : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { ok: false, error: data.error || "Failed to assign owner" };
+      }
+      return { ok: true, message: data.message };
+    } catch (err: any) {
+      return { ok: false, error: err.message || "Network error" };
+    }
+  }, []);
+
+  const removeOwner = useCallback(async (targetEmailOrUid: string) => {
+    try {
+      const isEmail = targetEmailOrUid.includes("@");
+      const res = await fetch("/api/developer/owners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "remove",
+          uid: isEmail ? undefined : targetEmailOrUid,
+          email: isEmail ? targetEmailOrUid : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { ok: false, error: data.error || "Failed to remove owner" };
+      }
+      return { ok: true, message: data.message };
+    } catch (err: any) {
+      return { ok: false, error: err.message || "Network error" };
+    }
+  }, []);
+
+  const createOwner = useCallback(async (input: { fullName: string; email: string; phone?: string; password?: string }) => {
+    try {
+      const res = await fetch("/api/developer/owners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create",
+          fullName: input.fullName,
+          email: input.email,
+          phone: input.phone,
+          password: input.password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { ok: false, error: data.error || "Failed to create owner" };
+      }
+      return { ok: true, message: data.message };
+    } catch (err: any) {
+      return { ok: false, error: err.message || "Network error" };
+    }
+  }, []);
+
   const value = useMemo<DataContextValue>(
     () => ({
       ready,
@@ -885,13 +1081,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       checkInAppointment,
       startService,
       completeAppointment,
+      updateAppointmentStatus,
       markNoShow,
       cancelAppointment,
       joinWalkIn,
       callNext,
       leaveQueue,
       convertToStaff,
+      createStaffMember,
+      removeStaff,
       toggleStaffActive,
+      updateUser,
       addService,
       updateService,
       deleteService,
@@ -900,6 +1100,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       updateOffer,
       deleteOffer,
       toggleOffer,
+      campaigns,
+      addCampaign,
+      updateCampaign,
+      deleteCampaign,
+      toggleCampaign,
       notify,
       markNotificationRead,
       markAllNotificationsRead,
@@ -912,16 +1117,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       getOffersFor,
       getAppointmentsForBranch,
       getShopStatus,
+      assignOwner,
+      removeOwner,
+      createOwner,
     }),
     [
-      ready, users, branches, services, offers, appointments, queue, notifications,
+      ready, users, branches, services, offers, campaigns, appointments, queue, liveQueue, notifications,
       currentUser, activeBranchId, login, register, logout, resetPassword, updatePassword, setActiveBranch,
       bookAppointment, confirmAppointment, rejectAppointment, checkInAppointment, startService,
-      completeAppointment, markNoShow, cancelAppointment, joinWalkIn, callNext, leaveQueue,
-      convertToStaff, toggleStaffActive, addService, updateService, deleteService, toggleService,
-      addOffer, updateOffer, deleteOffer, toggleOffer, notify, markNotificationRead,
-      markAllNotificationsRead, clearAllNotifications, notificationsFor, unreadCount, getBranch, getServicesFor,
-      getOffersFor, getAppointmentsForBranch, getShopStatus,
+      completeAppointment, updateAppointmentStatus, markNoShow, cancelAppointment, joinWalkIn, callNext, leaveQueue,
+      convertToStaff, createStaffMember, removeStaff, toggleStaffActive, updateUser, addService, updateService, deleteService, toggleService,
+      addOffer, updateOffer, deleteOffer, toggleOffer, addCampaign, updateCampaign, deleteCampaign, toggleCampaign, notify, markNotificationRead,
+      markAllNotificationsRead, clearAllNotifications, deleteNotification, notificationsFor, unreadCount, getBranch, getServicesFor,
+      getOffersFor, getAppointmentsForBranch, getShopStatus, assignOwner, removeOwner, createOwner,
     ]
   );
 
@@ -929,7 +1137,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 }
 
 function branchLabel(b: BranchId) {
-  return b === "lhasurane" ? "Lhasurane" : "Koregaon";
+  return "Koregaon";
 }
 
 function friendlyAuthError(e: unknown): string {

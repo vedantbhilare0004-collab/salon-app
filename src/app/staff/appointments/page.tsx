@@ -46,8 +46,7 @@ export default function StaffAppointments() {
     <div className="space-y-6">
       <PageHeader
         title="My Appointments"
-        subtitle={`All appointments at ${BRANCH_LABELS[activeBranchId]}`}
-        action={<div className="hidden sm:block"><BranchSwitcher /></div>}
+        subtitle="All appointments and bookings"
       />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={tab} onValueChange={setTab} className="flex-1">

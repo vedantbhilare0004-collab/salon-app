@@ -2,12 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2, User, Phone, Mail, Lock, Eye, EyeOff, Sparkles, CheckCircle2, Building2, MapPin } from "lucide-react";
+import {
+  Loader2,
+  User,
+  Phone,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Sparkles,
+  CheckCircle2,
+  MapPin,
+  ArrowRight,
+  ShieldCheck,
+} from "lucide-react";
 import { useData } from "@/lib/store";
-import { BRANCH_LABELS, type BranchId } from "@/lib/types";
+import { type BranchId } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -18,13 +30,13 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     password: "",
-    preferredBranch: "lhasurane" as BranchId,
+    preferredBranch: "koregaon" as BranchId,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  
-  // Validation on blur or submit
+
+  // Validation on submit
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!form.fullName.trim()) newErrors.fullName = "Full name is required";
@@ -33,14 +45,13 @@ export default function RegisterPage() {
     else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = "Enter a valid email address";
     if (!form.password) newErrors.password = "Password is required";
     else if (form.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
-    // Clear error when typing
     if (errors[k]) {
       setErrors((prev) => ({ ...prev, [k]: "" }));
     }
@@ -49,11 +60,11 @@ export default function RegisterPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setLoading(true);
     const res = await register(form);
     setLoading(false);
-    
+
     if (!res.ok) {
       setErrors({ form: res.error ?? "Registration failed. Please try again." });
       return;
@@ -72,281 +83,285 @@ export default function RegisterPage() {
     if (/[^A-Za-z0-9]/.test(form.password)) score += 1;
     return Math.min(score, 4);
   };
-  
+
   const strength = getPasswordStrength();
   const strengthLabels = ["Weak", "Fair", "Good", "Strong", "Excellent"];
   const strengthColors = ["bg-rose-500", "bg-orange-500", "bg-amber-500", "bg-emerald-500", "bg-emerald-600"];
 
   const features = [
-    "Book Appointments Anytime",
-    "Choose Your Preferred Stylist",
-    "Earn Loyalty Rewards",
-    "Track Appointment Status",
-    "Manage Your Visits"
+    { title: "Priority Slot Booking", desc: "Select services, preferred stylists, and times" },
+    { title: "Instant Boarding Passes", desc: "Digital queue pass sent to WhatsApp and Email" },
+    { title: "Bespoke Styling Dossier", desc: "Personal notes and history saved for your specialist" },
+    { title: "Salon Exclusive Offers", desc: "Direct seasonal deals from salon management" },
   ];
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Brand panel (Desktop & Tablet) */}
-      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-primary/90 to-primary p-12 text-primary-foreground md:flex md:w-5/12 lg:w-1/2">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 font-display text-2xl font-bold backdrop-blur">
-            G
-          </div>
-          <div>
-            <p className="font-display text-xl font-semibold">Glow &amp; Glamour</p>
-            <p className="text-xs uppercase tracking-[0.2em] opacity-80">Hair Studio</p>
-          </div>
+    <div className="flex min-h-screen bg-[#FDFCFB]">
+      {/* 1. Left Premium Brand Showcase (Desktop & Tablet) */}
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-[#121316] via-[#16181F] to-[#0D0E11] p-10 lg:p-14 text-[#FAF8F5] md:flex md:w-5/12 lg:w-1/2 border-r border-neutral-800/80">
+        {/* Ambient Radial Glow */}
+        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-[#C5A880]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Brand Top Header */}
+        <div className="relative z-10 flex items-center gap-3.5">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1F2128] border border-[#C5A880]/40 font-heading text-xl font-bold text-[#E5D3B3] shadow-md transition-transform group-hover:scale-105">
+              G&amp;G
+            </div>
+            <div>
+              <p className="font-heading text-xl font-semibold tracking-tight text-[#FAF8F5]">
+                Glow &amp; Glamour
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-[#C5A880] font-medium">
+                Hair Studio · Koregaon
+              </p>
+            </div>
+          </Link>
         </div>
-        
-        <div className="space-y-8">
-          <Sparkles className="h-10 w-10 opacity-90" />
-          <div className="space-y-4">
-            <h2 className="font-display text-3xl lg:text-4xl font-semibold leading-tight">
-              Premium salon experience, at your fingertips.
+
+        {/* Center Editorial Banner */}
+        <div className="relative z-10 space-y-8 my-auto py-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/30 text-[#E5D3B3] text-xs font-semibold tracking-wider uppercase shadow-xs">
+            <Sparkles className="h-3.5 w-3.5 text-[#C5A880]" />
+            <span>Join Our Client Network</span>
+          </div>
+
+          <div className="space-y-3 max-w-lg">
+            <h2 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-normal leading-[1.15] text-[#FAF8F5]">
+              Bespoke salon care, tailored to you.
             </h2>
-            <p className="max-w-md text-sm leading-relaxed opacity-90">
-              Create an account to unlock exclusive features tailored for our valued clients.
+            <p className="text-sm leading-relaxed text-neutral-300 font-light">
+              Create an account to reserve appointments with your favorite specialists, track your queue, and access seasonal treatments.
             </p>
           </div>
-          
-          <div className="space-y-4 pt-4">
-            {features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm font-medium opacity-90">
-                <CheckCircle2 className="h-5 w-5 opacity-80" />
-                <span>{feature}</span>
+
+          {/* Feature Highlights Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 max-w-lg">
+            {features.map((item, i) => (
+              <div
+                key={i}
+                className="p-3.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xs space-y-1"
+              >
+                <div className="flex items-center gap-2 text-[#E5D3B3] text-xs font-semibold">
+                  <CheckCircle2 className="h-4 w-4 text-[#C5A880] shrink-0" />
+                  <span>{item.title}</span>
+                </div>
+                <p className="text-[11px] text-neutral-400 font-light leading-snug pl-6">
+                  {item.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
-        
-        <p className="text-xs font-medium tracking-wide opacity-70">Lhasurane · Koregaon</p>
+
+        {/* Studio Location Footer */}
+        <div className="relative z-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-neutral-400">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-[#C5A880] shrink-0" />
+            <span className="font-medium text-neutral-300">
+              Laxmi Nagar, Koregaon, Maharashtra - 415501
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-[#C5A880] shrink-0" />
+            <span>Encrypted Member Portal</span>
+          </div>
+        </div>
       </div>
 
-      {/* Form panel */}
-      <div className="flex w-full flex-col items-center justify-center px-6 py-8 md:py-12 md:w-7/12 lg:w-1/2">
-        <div className="w-full max-w-[420px] mx-auto flex flex-col">
-          
-          {/* Mobile Logo */}
-          <Link href="/" className="flex flex-col items-center gap-3 mb-6 md:hidden">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary font-display text-2xl font-bold text-primary-foreground shadow-sm">
-              G
+      {/* 2. Right Form Panel */}
+      <div className="flex w-full flex-col items-center justify-center px-6 py-10 md:w-7/12 lg:w-1/2">
+        <div className="w-full max-w-[420px] mx-auto space-y-6">
+          {/* Mobile Header Wordmark */}
+          <Link href="/" className="flex flex-col items-center gap-2 mb-6 md:hidden">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#16181F] border border-[#C5A880]/50 font-heading text-lg font-bold text-[#E5D3B3] shadow-md">
+              G&amp;G
             </div>
             <div className="text-center">
-              <span className="font-display text-lg font-semibold block">Glow &amp; Glamour</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Hair Studio</span>
+              <span className="font-heading text-xl font-semibold text-foreground block">
+                Glow &amp; Glamour
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                Hair Studio · Koregaon
+              </span>
             </div>
           </Link>
 
-          <div className="w-full text-center md:text-left lg:text-center mb-6">
-            <h1 className="font-display text-[22px] md:text-[26px] lg:text-[30px] font-semibold tracking-tight text-foreground">
-              Create Account
+          {/* Form Header */}
+          <div className="text-center md:text-left space-y-2">
+            <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
+              Create an Account
             </h1>
-            <p className="text-[15px] text-muted-foreground font-medium mt-2">
-              Join Glow & Glamour to get started.
+            <p className="text-sm text-muted-foreground font-light leading-relaxed">
+              Register to book appointments, manage visits, and receive verified passes.
             </p>
           </div>
 
-          <form onSubmit={submit} className="w-full space-y-4" noValidate>
-            
+          {/* Registration Form */}
+          <form onSubmit={submit} className="space-y-4 pt-1" noValidate>
             {/* Full Name */}
             <div className="space-y-1.5">
+              <label htmlFor="name" className="text-xs font-semibold text-foreground">
+                Full Name
+              </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                  <User className="h-5 w-5" />
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
+                  <User className="h-4 w-4" />
                 </div>
                 <Input
                   id="name"
                   value={form.fullName}
                   onChange={(e) => set("fullName", e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="e.g. Rahul Sharma"
                   autoComplete="name"
                   className={cn(
-                    "h-[50px] lg:h-[54px] rounded-[14px] pl-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 bg-background/50 hover:bg-background",
-                    errors.fullName ? "border-rose-500 focus-visible:border-rose-500" : "border-border/80 focus-visible:border-primary"
+                    "h-11 rounded-lg pl-10 text-sm border-border bg-white shadow-2xs focus-visible:ring-1 focus-visible:ring-neutral-900 focus-visible:border-neutral-900 transition-all",
+                    errors.fullName && "border-rose-500 focus-visible:border-rose-500"
                   )}
                 />
               </div>
-              {errors.fullName && <p className="text-[13px] text-rose-600 font-medium pl-1">{errors.fullName}</p>}
+              {errors.fullName && <p className="text-xs text-rose-600 font-medium">{errors.fullName}</p>}
             </div>
 
             {/* Phone */}
             <div className="space-y-1.5">
+              <label htmlFor="phone" className="text-xs font-semibold text-foreground">
+                Phone Number (WhatsApp)
+              </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                  <Phone className="h-5 w-5" />
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
+                  <Phone className="h-4 w-4" />
                 </div>
                 <Input
                   id="phone"
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
-                  placeholder="Enter your phone number"
+                  placeholder="+91 98220 00000"
                   autoComplete="tel"
                   inputMode="tel"
                   className={cn(
-                    "h-[50px] lg:h-[54px] rounded-[14px] pl-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 bg-background/50 hover:bg-background",
-                    errors.phone ? "border-rose-500 focus-visible:border-rose-500" : "border-border/80 focus-visible:border-primary"
+                    "h-11 rounded-lg pl-10 text-sm border-border bg-white shadow-2xs focus-visible:ring-1 focus-visible:ring-neutral-900 focus-visible:border-neutral-900 transition-all",
+                    errors.phone && "border-rose-500 focus-visible:border-rose-500"
                   )}
                 />
               </div>
-              {errors.phone && <p className="text-[13px] text-rose-600 font-medium pl-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-xs text-rose-600 font-medium">{errors.phone}</p>}
             </div>
 
             {/* Email */}
             <div className="space-y-1.5">
+              <label htmlFor="email" className="text-xs font-semibold text-foreground">
+                Email Address
+              </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                  <Mail className="h-5 w-5" />
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
+                  <Mail className="h-4 w-4" />
                 </div>
                 <Input
                   id="email"
                   type="email"
                   value={form.email}
                   onChange={(e) => set("email", e.target.value)}
-                  placeholder="Enter your email address"
+                  placeholder="name@example.com"
                   autoComplete="email"
                   className={cn(
-                    "h-[50px] lg:h-[54px] rounded-[14px] pl-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 bg-background/50 hover:bg-background",
-                    errors.email ? "border-rose-500 focus-visible:border-rose-500" : "border-border/80 focus-visible:border-primary"
+                    "h-11 rounded-lg pl-10 text-sm border-border bg-white shadow-2xs focus-visible:ring-1 focus-visible:ring-neutral-900 focus-visible:border-neutral-900 transition-all",
+                    errors.email && "border-rose-500 focus-visible:border-rose-500"
                   )}
                 />
               </div>
-              {errors.email && <p className="text-[13px] text-rose-600 font-medium pl-1">{errors.email}</p>}
+              {errors.email && <p className="text-xs text-rose-600 font-medium">{errors.email}</p>}
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
+              <label htmlFor="password" className="text-xs font-semibold text-foreground">
+                Password
+              </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                  <Lock className="h-5 w-5" />
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
+                  <Lock className="h-4 w-4" />
                 </div>
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={form.password}
                   onChange={(e) => set("password", e.target.value)}
-                  placeholder="Create a password"
+                  placeholder="Create a strong password"
                   autoComplete="new-password"
                   className={cn(
-                    "h-[50px] lg:h-[54px] rounded-[14px] pl-11 pr-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 bg-background/50 hover:bg-background",
-                    errors.password ? "border-rose-500 focus-visible:border-rose-500" : "border-border/80 focus-visible:border-primary"
+                    "h-11 rounded-lg pl-10 pr-10 text-sm border-border bg-white shadow-2xs focus-visible:ring-1 focus-visible:ring-neutral-900 focus-visible:border-neutral-900 transition-all",
+                    errors.password && "border-rose-500 focus-visible:border-rose-500"
                   )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-foreground transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-foreground transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              
-              {/* Password Strength Indicator */}
-              {form.password.length > 0 && (
-                <div className="pt-2 px-1">
-                  <div className="flex h-1.5 w-full gap-1 overflow-hidden rounded-full bg-muted/50">
-                    {[0, 1, 2, 3].map((idx) => (
+              {errors.password && <p className="text-xs text-rose-600 font-medium">{errors.password}</p>}
+
+              {/* Password strength meter */}
+              {form.password && (
+                <div className="pt-1.5 space-y-1">
+                  <div className="flex gap-1 h-1">
+                    {[0, 1, 2, 3, 4].map((i) => (
                       <div
-                        key={idx}
+                        key={i}
                         className={cn(
-                          "h-full flex-1 transition-all duration-300",
-                          strength >= idx ? strengthColors[strength] : "bg-transparent"
+                          "h-full flex-1 rounded-full transition-all duration-300",
+                          i <= strength ? strengthColors[strength] : "bg-neutral-200"
                         )}
                       />
                     ))}
                   </div>
-                  <div className="flex justify-between items-center mt-1.5">
-                    <p className={cn("text-[12px] font-medium transition-colors", strength < 2 ? "text-rose-500" : "text-muted-foreground")}>
-                      {strengthLabels[strength]} password
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">Min 6 chars</p>
-                  </div>
+                  <p className="text-[10px] text-muted-foreground text-right font-medium">
+                    Strength: {strength >= 0 ? strengthLabels[strength] : ""}
+                  </p>
                 </div>
               )}
-              {errors.password && <p className="text-[13px] text-rose-600 font-medium pl-1">{errors.password}</p>}
-            </div>
-
-            {/* Preferred Branch */}
-            <div className="pt-2 space-y-3">
-              <Label className="text-sm font-medium text-foreground ml-1">Preferred Branch</Label>
-              <div className="grid grid-cols-2 gap-3">
-                {(Object.keys(BRANCH_LABELS) as BranchId[]).map((b) => {
-                  const isSelected = form.preferredBranch === b;
-                  return (
-                    <button
-                      type="button"
-                      key={b}
-                      onClick={() => set("preferredBranch", b)}
-                      className={cn(
-                        "relative flex flex-col items-start gap-1 rounded-[14px] border p-4 text-left transition-all duration-200",
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm"
-                          : "border-border/80 bg-background/50 hover:bg-accent/50 hover:border-border"
-                      )}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <span className={cn("font-semibold text-sm", isSelected ? "text-primary" : "text-foreground")}>
-                          {BRANCH_LABELS[b]}
-                        </span>
-                        <div className={cn(
-                          "h-4 w-4 rounded-full border flex items-center justify-center transition-all",
-                          isSelected ? "border-primary bg-primary" : "border-muted-foreground/30"
-                        )}>
-                          {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
             </div>
 
             {errors.form && (
-              <div className="pt-2">
-                <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:bg-rose-950 dark:text-rose-300">
-                  {errors.form}
-                </p>
+              <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs font-medium text-rose-700 animate-in fade-in">
+                {errors.form}
               </div>
             )}
 
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                className="h-[52px] lg:h-[56px] w-full rounded-[14px] text-base font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.98] shadow-md hover:shadow-lg disabled:opacity-70 disabled:active:scale-100"
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className="h-11 w-full rounded-lg bg-[#18181B] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.99] disabled:opacity-70"
                 disabled={loading}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating Account...
                   </>
                 ) : (
-                  "Create Account"
+                  <>
+                    Create Account <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                  </>
                 )}
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 w-full text-center space-y-4 pb-8">
-            <p className="text-[13px] text-muted-foreground leading-relaxed px-2">
-              By creating an account, you agree to our{" "}
-              <Link href="#" className="font-medium text-foreground hover:text-primary transition-colors hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="#" className="font-medium text-foreground hover:text-primary transition-colors hover:underline">
-                Privacy Policy
-              </Link>.
-            </p>
-            <div className="text-[15px] text-muted-foreground pt-2">
+          {/* Footer switcher */}
+          <div className="pt-2 text-center text-xs text-muted-foreground border-t border-border/60">
+            <p>
               Already have an account?{" "}
-              <Link href="/login" className="font-semibold text-primary hover:underline transition-all">
+              <Link href="/login" className="font-semibold text-foreground hover:underline transition-all">
                 Sign in
               </Link>
-            </div>
+            </p>
           </div>
-          
         </div>
       </div>
     </div>

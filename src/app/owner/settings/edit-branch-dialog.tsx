@@ -52,16 +52,16 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-md border border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24]">
         <DialogHeader>
-          <DialogTitle>Edit Branch Information</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="font-semibold text-lg text-[#302A24]">Edit Branch Information</DialogTitle>
+          <DialogDescription className="text-xs text-[#74695E]">
             Update the details for {branch?.name}. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+        <div className="grid gap-3.5 py-3">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="name" className="text-right text-xs text-[#302A24]">
               Name
             </Label>
             <Input
@@ -69,11 +69,11 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               name="name"
               value={formData.name || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="tagline" className="text-right">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="tagline" className="text-right text-xs text-[#302A24]">
               Tagline
             </Label>
             <Input
@@ -81,11 +81,11 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               name="tagline"
               value={formData.tagline || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="address" className="text-right">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="address" className="text-right text-xs text-[#302A24]">
               Address
             </Label>
             <Input
@@ -93,11 +93,11 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               name="address"
               value={formData.address || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="city" className="text-right">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="city" className="text-right text-xs text-[#302A24]">
               City
             </Label>
             <Input
@@ -105,11 +105,11 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               name="city"
               value={formData.city || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="phone" className="text-right">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="phone" className="text-right text-xs text-[#302A24]">
               Phone
             </Label>
             <Input
@@ -117,11 +117,11 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               name="phone"
               value={formData.phone || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="totalChairs" className="text-right">
+          <div className="grid grid-cols-4 items-center gap-3">
+            <Label htmlFor="totalChairs" className="text-right text-xs text-[#302A24]">
               Chairs
             </Label>
             <Input
@@ -130,15 +130,15 @@ export function EditBranchDialog({ branch, open, onOpenChange }: EditBranchDialo
               type="number"
               value={formData.totalChairs || ""}
               onChange={handleChange}
-              className="col-span-3"
+              className="col-span-3 h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
           </div>
         </div>
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="pt-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} className="rounded-md border-[#E9E1D6] text-[#302A24] hover:bg-[#F0EBE3] text-xs">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleSave} disabled={loading}>
+          <Button type="submit" size="sm" onClick={handleSave} disabled={loading} className="rounded-md bg-[#A27C48] hover:bg-[#876438] text-white font-medium text-xs transition-colors">
             {loading ? "Saving..." : "Save changes"}
           </Button>
         </DialogFooter>

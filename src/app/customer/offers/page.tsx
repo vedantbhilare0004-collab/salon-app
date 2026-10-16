@@ -30,7 +30,7 @@ export default function CustomerOffers() {
     <div className="space-y-6">
       <PageHeader
         title={t("offers.title")}
-        subtitle={t("offers.subtitle", { branch: BRANCH_LABELS[activeBranchId] })}
+        subtitle="Exclusive salon promotions and beauty packages."
       />
       {offers.length === 0 ? (
         <EmptyState icon={Tag} title={t("offers.no_offers")} description={t("offers.no_offers_desc")} />
@@ -52,7 +52,7 @@ export default function CustomerOffers() {
                   {o.badge}
                 </span>
                 <span className="text-xs font-medium text-primary/80">
-                  {o.branchId === "all" ? "All branches" : BRANCH_LABELS[o.branchId as "lhasurane" | "koregaon"]}
+                  Glow &amp; Glamour
                 </span>
               </div>
               
@@ -108,10 +108,8 @@ export default function CustomerOffers() {
                   <span className="font-medium">{formatDate(selectedOffer.endsAt)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Available at</span>
-                  <span className="font-medium">
-                    {selectedOffer.branchId === "all" ? "All branches" : BRANCH_LABELS[selectedOffer.branchId as "lhasurane" | "koregaon"]}
-                  </span>
+                  <span className="text-muted-foreground">Location</span>
+                  <span className="font-medium">Glow &amp; Glamour Hair Studio</span>
                 </div>
                 
                 <div className="pt-2 border-t mt-2">
@@ -121,15 +119,22 @@ export default function CustomerOffers() {
                 </div>
               </div>
 
-              <DialogFooter className="sm:justify-between items-center pt-2">
-                <Button variant="ghost" onClick={() => setSelectedOffer(null)}>
+              <DialogFooter className="sm:justify-between items-center gap-2 pt-2">
+                <Button variant="ghost" size="sm" onClick={() => setSelectedOffer(null)}>
                   Close
                 </Button>
-                <Button asChild className="px-6 shadow-md hover:shadow-lg transition-shadow">
-                  <Link href="/customer/book">
-                    Book Now with this Offer
-                  </Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/offers/${selectedOffer.id}`}>
+                      View Details
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" className="bg-[#222220] hover:bg-black text-[#FAF8F5]">
+                    <Link href={`/customer/book?offerId=${selectedOffer.id}`}>
+                      Book Now with this Offer
+                    </Link>
+                  </Button>
+                </div>
               </DialogFooter>
             </>
           )}

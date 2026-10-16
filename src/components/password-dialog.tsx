@@ -52,31 +52,31 @@ export function PasswordDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] rounded-none sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
-          <DialogDescription>Enter your current password to set a new one.</DialogDescription>
+          <DialogTitle className="text-lg font-semibold text-[#302A24]">Change Password</DialogTitle>
+          <DialogDescription className="text-sm text-[#74695E]">Enter your current password to set a new one.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           <div className="space-y-1.5">
-            <Label htmlFor="cur">Current Password</Label>
-            <Input id="cur" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} />
+            <Label htmlFor="cur" className="text-xs uppercase tracking-wider font-semibold text-[#74695E]">Current Password</Label>
+            <Input id="cur" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} className="bg-[#FFFDFA] border-[#E9E1D6] text-[#302A24] focus-visible:ring-[#A27C48] rounded-none" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="nxt">New Password</Label>
-            <Input id="nxt" type="password" value={next} onChange={(e) => setNext(e.target.value)} />
+            <Label htmlFor="nxt" className="text-xs uppercase tracking-wider font-semibold text-[#74695E]">New Password</Label>
+            <Input id="nxt" type="password" value={next} onChange={(e) => setNext(e.target.value)} className="bg-[#FFFDFA] border-[#E9E1D6] text-[#302A24] focus-visible:ring-[#A27C48] rounded-none" />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cfg">Confirm New Password</Label>
-            <Input id="cfg" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+            <Label htmlFor="cfg" className="text-xs uppercase tracking-wider font-semibold text-[#74695E]">Confirm New Password</Label>
+            <Input id="cfg" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="bg-[#FFFDFA] border-[#E9E1D6] text-[#302A24] focus-visible:ring-[#A27C48] rounded-none" />
           </div>
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+          {error && <p className="text-xs font-medium text-[#8C3930] bg-[#F7E7E3] p-2 border border-[#E9E1D6]">{error}</p>}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="mt-4 gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-none border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] hover:bg-[#F0EBE3]">
             Cancel
           </Button>
-          <Button onClick={submit}>Update Password</Button>
+          <Button onClick={submit} className="rounded-none bg-[#A27C48] hover:bg-[#876438] text-white">Update Password</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

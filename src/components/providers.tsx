@@ -6,11 +6,23 @@ import { Toaster } from "@/components/ui/sonner";
 import { DataProvider } from "@/lib/store";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthGate } from "@/components/auth-gate";
+import { VisitorTracker } from "@/components/analytics/visitor-tracker";
+import { DeveloperHUD } from "@/components/developer/developer-hud";
+import { StartupSplash } from "@/components/startup-splash";
+import { LuxuryRouteLoader } from "@/components/ui/luxury-route-loader";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    if ("serviceWorker" in navigator) {
+      if (process.env.NODE_ENV === "production") {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      } else {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
     }
   }, []);
 
@@ -23,7 +35,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <I18nProvider>
         <DataProvider>
+          <StartupSplash />
+          <LuxuryRouteLoader />
+          <VisitorTracker />
           <AuthGate>{children}</AuthGate>
+          <DeveloperHUD />
           <Toaster position="top-center" richColors closeButton />
         </DataProvider>
       </I18nProvider>

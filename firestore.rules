@@ -6,43 +6,93 @@ service cloud.firestore {
     function signedIn() {
       return request.auth != null;
     }
-    function userDoc() {
+
+    function userExists() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
+
+    // Direct email bypass for designated owners/developers so permission is never denied
+    function isMasterAdmin() {
+      return signedIn() && (
+        request.auth.token.email == 'prathmeshbhilare52@gmail.com' ||
+        request.auth.token.email == 'prathmeshbhilare36@gmail.com' ||
+        request.auth.token.email == 'shantanukashid8@gmail.com'
+      );
+    }
+
+    function isDeveloper() {
+      return signedIn() && (
+        isMasterAdmin() ||
+        request.auth.token.role == 'developer' ||
+        (userExists() && getUserData().get('role', '') == 'developer')
+      );
+    }
+
     function isOwner() {
-      return signedIn() && userDoc().role == 'owner';
+      return signedIn() && (
+        isMasterAdmin() ||
+        isDeveloper() ||
+        request.auth.token.role == 'owner' ||
+        (userExists() && getUserData().get('role', '') == 'owner')
+      );
     }
+
     function isStaff() {
-      return signedIn() && userDoc().role == 'staff';
+      return signedIn() && (
+        request.auth.token.role == 'staff' ||
+        (userExists() && getUserData().get('role', '') == 'staff')
+      );
     }
+
     function staffBranch() {
-      return userDoc().staffBranch;
+      return userExists() ? getUserData().get('staffBranch', '') : '';
     }
 
     // ---- users ----
     match /users/{id} {
-      allow read: if signedIn() && (id == request.auth.uid || isOwner());
-      allow create: if signedIn() && id == request.auth.uid;
+      allow read: if signedIn() && (id == request.auth.uid || isOwner() || isStaff());
+      allow create: if signedIn() && (id == request.auth.uid || isOwner() || isStaff());
       allow update: if signedIn() && (id == request.auth.uid || isOwner());
+      allow delete: if isOwner();
+    }
+
+    // ---- customers ----
+    match /customers/{id} {
+      allow read: if signedIn() && (
+        resource.data.authUid == request.auth.uid || isOwner() || isStaff()
+      );
+      allow create: if signedIn() && (isOwner() || isStaff());
+      allow update: if signedIn() && (
+        resource.data.authUid == request.auth.uid || isOwner() || isStaff()
+      );
       allow delete: if isOwner();
     }
 
     // ---- branches ----
     match /branches/{id} {
-      allow read: if signedIn();
-      allow update: if signedIn();
+      allow read: if true;  // Public: customers need to see branch info
       allow write: if isOwner();
     }
 
     // ---- services ----
     match /services/{id} {
-      allow read: if signedIn();
+      allow read: if true;  // Public: customers need to see services before booking
       allow write: if isOwner();
     }
 
     // ---- offers ----
     match /offers/{id} {
-      allow read: if signedIn();
+      allow read: if true;  // Public: customers can see current offers
+      allow write: if isOwner();
+    }
+
+    // ---- campaigns ----
+    match /campaigns/{id} {
+      allow read: if true;  // Public: customers can see campaign info
       allow write: if isOwner();
     }
 
@@ -54,46 +104,101 @@ service cloud.firestore {
         (isStaff() && resource.data.branchId == staffBranch())
       );
       allow create: if signedIn() && (
-        request.resource.data.customerUid == request.auth.uid || isOwner() || isStaff()
+        isOwner() || 
+        isStaff() || 
+        request.resource.data.customerUid == request.auth.uid
       );
-      allow update, delete: if signedIn() && (
-        isOwner() || (isStaff() && resource.data.branchId == staffBranch()) ||
+      allow update: if signedIn() && (
+        isOwner() || 
+        (isStaff() && resource.data.branchId == staffBranch()) ||
         resource.data.customerUid == request.auth.uid
       );
+      allow delete: if signedIn() && (
+        isOwner() || 
+        (isStaff() && resource.data.branchId == staffBranch())
+      );
+    }
+
+    // ---- invoices ----
+    match /invoices/{id} {
+      allow read: if signedIn() && (
+        resource.data.customerUid == request.auth.uid || isOwner() || isStaff()
+      );
+      allow write: if signedIn() && (isOwner() || isStaff());
+    }
+
+    // ---- payments ----
+    match /payments/{id} {
+      allow read: if signedIn() && (
+        resource.data.customerUid == request.auth.uid || isOwner() || isStaff()
+      );
+      allow write: if signedIn() && (isOwner() || isStaff());
     }
 
     // ---- liveQueue ----
     match /liveQueue/{id} {
-      allow read: if signedIn();
-      allow create, update, delete: if signedIn() && (isOwner() || isStaff());
+      allow read: if true; // Public display or customer tracking
+      allow write: if signedIn() && (isOwner() || isStaff());
+    }
+
+    // ---- attendance_shifts ----
+    match /attendance_shifts/{id} {
+      allow read: if signedIn() && (
+        isOwner() || 
+        isStaff() || 
+        resource.data.staffId == request.auth.uid
+      );
+      allow create, update: if signedIn() && (
+        isOwner() || 
+        isStaff() || 
+        request.resource.data.staffId == request.auth.uid
+      );
+      allow delete: if isOwner();
+    }
+
+    // ---- staff ----
+    match /staff/{id} {
+      allow read: if true;
+      allow write: if isOwner();
     }
 
     // ---- notifications ----
     match /notifications/{id} {
       allow read: if signedIn() && (
+        isOwner() ||
         resource.data.recipientUid == request.auth.uid ||
-        resource.data.recipientId == userDoc().userId ||
         resource.data.recipientId == request.auth.uid ||
-        resource.data.audience == userDoc().role ||
-        (resource.data.branchId == staffBranch())
+        (userExists() && (
+          resource.data.recipientId == getUserData().get('userId', '') ||
+          resource.data.audience == getUserData().get('role', '') ||
+          resource.data.branchId == staffBranch()
+        ))
       );
       allow create: if signedIn();
       allow update: if signedIn() && (
+        isOwner() ||
         resource.data.recipientUid == request.auth.uid ||
-        resource.data.recipientId == userDoc().userId ||
         resource.data.recipientId == request.auth.uid
       );
-      allow delete: if isOwner() || (signedIn() && (
+      allow delete: if signedIn() && (
+        isOwner() ||
         resource.data.recipientUid == request.auth.uid ||
-        resource.data.recipientId == userDoc().userId ||
         resource.data.recipientId == request.auth.uid
-      ));
+      );
     }
 
     // ---- settings ----
     match /settings/{id} {
-      allow read: if signedIn();
+      allow read: if true;
       allow write: if isOwner();
+    }
+
+    // ---- analytics & visitors ----
+    match /analytics/{id} {
+      allow read, write: if isOwner() || isDeveloper();
+    }
+    match /site_visitors/{id} {
+      allow read, write: if isOwner() || isDeveloper();
     }
   }
 }

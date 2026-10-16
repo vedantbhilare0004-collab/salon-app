@@ -47,23 +47,23 @@ export function EditWorkingHoursDialog({ branch, open, onOpenChange }: EditWorki
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] rounded-md border border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24]">
         <DialogHeader>
-          <DialogTitle>Edit Working Hours</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="font-semibold text-lg text-[#302A24]">Edit Working Hours</DialogTitle>
+          <DialogDescription className="text-xs text-[#74695E]">
             Update the working schedule for {branch?.name}. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
+        <div className="grid gap-3.5 py-3 max-h-[60vh] overflow-y-auto">
           {workingHours.map((wh, idx) => (
-            <div key={wh.day} className="flex items-center gap-4 border-b border-border/50 pb-3 last:border-0 last:pb-0">
-              <div className="w-12 font-medium">{wh.day}</div>
+            <div key={wh.day} className="flex items-center gap-4 border-b border-[#E9E1D6] pb-3 last:border-0 last:pb-0">
+              <div className="w-12 font-medium text-xs text-[#302A24]">{wh.day}</div>
               <div className="flex items-center gap-2">
                 <Switch
                   checked={!wh.closed}
                   onCheckedChange={(checked) => handleDayChange(idx, "closed", !checked)}
                 />
-                <span className="text-sm w-12 text-muted-foreground">{wh.closed ? "Closed" : "Open"}</span>
+                <span className="text-xs w-12 text-[#74695E]">{wh.closed ? "Closed" : "Open"}</span>
               </div>
               {!wh.closed && (
                 <div className="flex items-center gap-2 flex-1">
@@ -71,25 +71,25 @@ export function EditWorkingHoursDialog({ branch, open, onOpenChange }: EditWorki
                     type="time"
                     value={wh.open}
                     onChange={(e) => handleDayChange(idx, "open", e.target.value)}
-                    className="w-full text-sm h-8"
+                    className="w-full text-xs h-8 rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
                   />
-                  <span>to</span>
+                  <span className="text-xs text-[#74695E]">to</span>
                   <Input
                     type="time"
                     value={wh.close}
                     onChange={(e) => handleDayChange(idx, "close", e.target.value)}
-                    className="w-full text-sm h-8"
+                    className="w-full text-xs h-8 rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
                   />
                 </div>
               )}
             </div>
           ))}
         </div>
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="pt-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)} className="rounded-md border-[#E9E1D6] text-[#302A24] hover:bg-[#F0EBE3] text-xs">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleSave} disabled={loading}>
+          <Button type="submit" size="sm" onClick={handleSave} disabled={loading} className="rounded-md bg-[#A27C48] hover:bg-[#876438] text-white font-medium text-xs transition-colors">
             {loading ? "Saving..." : "Save changes"}
           </Button>
         </DialogFooter>

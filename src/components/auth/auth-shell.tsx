@@ -17,29 +17,28 @@ export function AuthShell({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Brand panel */}
-      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-primary/90 to-primary p-10 text-primary-foreground lg:flex">
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-gradient-to-br from-[#121316] via-[#16181F] to-[#0D0E11] p-10 text-[#FAF8F5] lg:flex border-r border-neutral-800">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 font-display text-2xl font-bold backdrop-blur">
-            G
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1F2128] border border-[#C5A880]/40 font-heading text-xl font-bold text-[#E5D3B3]">
+            G&amp;G
           </div>
           <div>
-            <p className="font-display text-xl font-semibold">Glow &amp; Glamour</p>
-            <p className="text-xs uppercase tracking-[0.2em] opacity-80">Hair Studio</p>
+            <p className="font-heading text-xl font-semibold text-[#FAF8F5]">Glow &amp; Glamour</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#C5A880]">Hair Studio</p>
           </div>
         </div>
         <div className="space-y-6">
-          <Sparkles className="h-10 w-10 opacity-90" />
+          <Sparkles className="h-10 w-10 text-[#C5A880]" />
           <div className="space-y-3">
-            <h2 className="font-display text-4xl font-semibold leading-tight">
-              Beauty, booked beautifully.
+            <h2 className="font-heading text-4xl font-normal leading-tight text-[#FAF8F5]">
+              Beauty, styled &amp; reserved beautifully.
             </h2>
-            <p className="max-w-sm text-sm opacity-90">
-              Two branches, live queues, and a premium salon experience for customers,
-              staff, and owners — all in one elegant app.
+            <p className="max-w-sm text-sm text-neutral-300 font-light">
+              Experience seamless reservations, live queue management, and personalized styling care at our Koregaon salon studio.
             </p>
           </div>
         </div>
-        <p className="text-xs opacity-70">Lhasurane · Koregaon</p>
+        <p className="text-xs text-neutral-400">Laxmi Nagar, Koregaon · Maharashtra - 415501</p>
       </div>
 
       {/* Form panel */}

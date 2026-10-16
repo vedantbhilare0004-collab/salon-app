@@ -1,10 +1,13 @@
-const CACHE_NAME = 'glow-salon-pwa-v1';
+const CACHE_NAME = 'glow-salon-pwa-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.svg',
-  '/icons/icon-512x512.svg',
-  '/icons/icon-maskable.svg'
+  '/pwa-192x192.png',
+  '/pwa-512x512.png',
+  '/pwa-maskable-512x512.png',
+  '/apple-touch-icon.png',
+  '/favicon.png',
+  '/favicon.ico'
 ];
 
 self.addEventListener('install', (event) => {
@@ -40,26 +43,37 @@ self.addEventListener('fetch', (event) => {
   
   const url = new URL(event.request.url);
 
-  // Skip caching API routes completely so data is always fresh
-  if (url.pathname.startsWith('/api/')) return;
+  // In development on localhost, do NOT intercept or cache to prevent HMR and Turbopack chunk corruption
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return;
+
+  // Skip caching Next.js internals, chunks, and API routes
+  if (url.pathname.startsWith('/_next/') || url.pathname.startsWith('/api/')) return;
   
-  // Skip caching cross-origin requests like Google Fonts or Firebase APIs unless explicitly handled
+  // Skip caching cross-origin requests
   if (url.origin !== self.location.origin) return;
 
-  // Stale-While-Revalidate caching strategy for everything else
+  // Stale-While-Revalidate caching strategy for static production assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
-        });
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse;
+        }
+
+        try {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache).catch(() => {});
+          }).catch(() => {});
+        } catch {
+          // Ignore clone failures if body was already consumed
+        }
+
         return networkResponse;
       }).catch(() => {
-        // Fallback behavior if network fails (offline)
         return cachedResponse;
       });
 
-      // Return cached response immediately if available, otherwise wait for network
       return cachedResponse || fetchPromise;
     })
   );

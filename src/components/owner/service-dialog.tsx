@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useData } from "@/lib/store";
-import { BRANCH_LABELS, type BranchId, type Service } from "@/lib/types";
+import { type BranchId, type Service } from "@/lib/types";
+import { CATALOGUE_CATEGORIES } from "@/lib/catalogue-data";
 import {
   Dialog,
   DialogContent,
@@ -34,10 +35,13 @@ export function ServiceDialog({
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
+  const [variant, setVariant] = useState<"" | "Male" | "Female">("");
   const [active, setActive] = useState(true);
   const [error, setError] = useState("");
 
-  const categories = Array.from(new Set(services.map((s) => s.category))).sort();
+  const existingCategories = Array.from(
+    new Set([...CATALOGUE_CATEGORIES, ...services.filter(s => !s.archived).map((s) => s.category)])
+  );
 
   useEffect(() => {
     if (service) {
@@ -45,14 +49,16 @@ export function ServiceDialog({
       setCategory(service.category);
       setName(service.name);
       setPrice(String(service.price));
-      setDuration(String(service.durationMin));
+      setDuration(String(service.durationMin || service.durationMinutes || 30));
+      setVariant((service.variant as "" | "Male" | "Female") || (service.gender === "male" ? "Male" : service.gender === "female" ? "Female" : ""));
       setActive(service.active);
     } else {
       setBranchId(defaultBranch);
-      setCategory("");
+      setCategory(CATALOGUE_CATEGORIES[0]);
       setName("");
       setPrice("");
-      setDuration("");
+      setDuration("30");
+      setVariant("");
       setActive(true);
     }
     setError("");
@@ -67,99 +73,193 @@ export function ServiceDialog({
     const priceNum = Number(price);
     const durNum = Number(duration);
     if (!priceNum || priceNum <= 0) {
-      setError("Enter a valid price.");
+      setError("Enter a valid price in INR.");
       return;
     }
     if (!durNum || durNum <= 0) {
       setError("Enter a valid duration in minutes.");
       return;
     }
-    const payload = {
+
+    const genderVal =
+      variant === "Male" ? "male" : variant === "Female" ? "female" : "unisex";
+
+    const payload: Partial<Service> = {
       branchId,
       category: category.trim(),
       name: name.trim(),
       price: priceNum,
       durationMin: durNum,
+      durationMinutes: durNum,
+      gender: genderVal,
+      variant: variant || undefined,
       active,
+      isActive: active,
+      archived: false,
     };
+
     if (service) {
       updateService(service.id, payload);
       toast.success("Service updated");
     } else {
-      addService(payload);
-      toast.success("Service added");
+      addService(payload as Omit<Service, "id">);
+      toast.success("Service added to catalogue");
     }
     onClose();
   }
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent className="rounded-md border border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{service ? "Edit Service" : "Add Service"}</DialogTitle>
-          <DialogDescription>Categories are free-form — type a new one any time.</DialogDescription>
+          <DialogTitle className="font-semibold text-lg text-[#302A24]">
+            {service ? "Edit Service" : "Add Service"}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-[#74695E]">
+            Configure treatment details, category, pricing, and gender variants.
+          </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
+
+        <div className="space-y-3 py-1">
           <div className="space-y-1.5">
-            <Label>Branch</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {(["lhasurane", "koregaon"] as BranchId[]).map((b) => (
-                <button
-                  key={b}
-                  onClick={() => setBranchId(b)}
-                  className={
-                    "rounded-xl border py-2 text-sm font-medium transition-colors " +
-                    (branchId === b ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-accent")
-                  }
-                >
-                  {BRANCH_LABELS[b]}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cat">Category</Label>
+            <Label htmlFor="cat" className="text-xs font-medium text-[#302A24]">
+              Category
+            </Label>
             <Input
               id="cat"
               list="category-list"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Haircuts"
+              placeholder="e.g. Female Haircut, Wax, Hair Spa..."
+              className="h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
             />
             <datalist id="category-list">
-              {categories.map((c) => (
+              {existingCategories.map((c) => (
                 <option key={c} value={c} />
               ))}
             </datalist>
           </div>
+
           <div className="space-y-1.5">
-            <Label htmlFor="name">Service Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Premium Styling Cut" />
+            <Label htmlFor="name" className="text-xs font-medium text-[#302A24]">
+              Service Name
+            </Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Loreal (Amp)"
+              className="h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
+            />
           </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-[#302A24]">
+              Variant / Gender
+            </Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={variant === "" ? "default" : "outline"}
+                size="sm"
+                className={`h-8 text-xs flex-1 rounded-md ${
+                  variant === ""
+                    ? "bg-[#302A24] text-white"
+                    : "border-[#E9E1D6] text-[#74695E]"
+                }`}
+                onClick={() => setVariant("")}
+              >
+                Standard / Unisex
+              </Button>
+              <Button
+                type="button"
+                variant={variant === "Male" ? "default" : "outline"}
+                size="sm"
+                className={`h-8 text-xs flex-1 rounded-md ${
+                  variant === "Male"
+                    ? "bg-[#2563EB] text-white"
+                    : "border-[#E9E1D6] text-[#74695E]"
+                }`}
+                onClick={() => setVariant("Male")}
+              >
+                Male
+              </Button>
+              <Button
+                type="button"
+                variant={variant === "Female" ? "default" : "outline"}
+                size="sm"
+                className={`h-8 text-xs flex-1 rounded-md ${
+                  variant === "Female"
+                    ? "bg-[#DB2777] text-white"
+                    : "border-[#E9E1D6] text-[#74695E]"
+                }`}
+                onClick={() => setVariant("Female")}
+              >
+                Female
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="price">Price (₹)</Label>
-              <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+              <Label htmlFor="price" className="text-xs font-medium text-[#302A24]">
+                Price (₹ INR)
+              </Label>
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="1"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="250"
+                className="h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
+              />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="dur">Duration (min)</Label>
-              <Input id="dur" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} />
+              <Label htmlFor="dur" className="text-xs font-medium text-[#302A24]">
+                Duration (min)
+              </Label>
+              <Input
+                id="dur"
+                type="number"
+                min="5"
+                step="5"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="30"
+                className="h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
+              />
             </div>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-border p-3">
+
+          <div className="flex items-center justify-between rounded-md border border-[#E9E1D6] bg-[#F6F3ED]/40 p-3">
             <div>
-              <Label className="font-medium">Active</Label>
-              <p className="text-xs text-muted-foreground">Visible to customers for booking</p>
+              <Label className="font-medium text-xs text-[#302A24]">Active Catalogue Status</Label>
+              <p className="text-[11px] text-[#74695E]">Visible for online bookings and live queue</p>
             </div>
             <Switch checked={active} onCheckedChange={setActive} />
           </div>
-          {error && <p className="text-sm text-rose-600">{error}</p>}
+
+          {error && <p className="text-xs text-[#8C3930]">{error}</p>}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+
+        <DialogFooter className="pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="rounded-md border-[#E9E1D6] text-[#302A24] hover:bg-[#F0EBE3] text-xs"
+          >
             Cancel
           </Button>
-          <Button onClick={save}>{service ? "Save Changes" : "Add Service"}</Button>
+          <Button
+            size="sm"
+            onClick={save}
+            className="rounded-md bg-[#A27C48] hover:bg-[#876438] text-white font-medium text-xs transition-colors"
+          >
+            {service ? "Save Changes" : "Add Service"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

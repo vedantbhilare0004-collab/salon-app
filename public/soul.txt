@@ -1,0 +1,619 @@
+====================================================================================================
+                        GLOW & GLAMOUR SALON — SYSTEM SOUL & BLUEPRINT
+====================================================================================================
+Project Identity: Glow & Glamour Salon & Spa (Hair Studio)
+Version: Production V1.0 Architecture & Design System
+Domain: Premium Salon & Spa Management Suite (Public Experience + Unified Multi-Role CRM)
+Location Reference: Near ZP School, Laxmi Nagar, Koregaon, Maharashtra 415501
+Philosophy: "Rooted in Tradition. Elevated for Today."
+
+----------------------------------------------------------------------------------------------------
+TABLE OF CONTENTS
+----------------------------------------------------------------------------------------------------
+1. THE SOUL, IDENTITY & PRODUCT MANIFESTO
+2. THE UNIFIED ARCHITECTURAL PRINCIPLE ("Three Interfaces, One Source of Truth")
+3. THE FREE-FIRST ARCHITECTURE PHILOSOPHY
+4. SYSTEM ARCHITECTURE & FULL TECH STACK
+5. COMPLETE DATABASE SCHEMAS & FIRESTORE RULES
+6. AUTHENTICATION, ROLES & SECURITY ENGINE
+7. END-TO-END BUSINESS LOGIC & CRITICAL FLOWS
+   - 7.1 Dynamic Reservation & Staff Conflict-Resolution Algorithm
+   - 7.2 Brevo Transactional Email Engine & Base64 PDF Ticket Generation
+   - 7.3 Real-Time Camera QR Code Ticket Verification (Front-Desk Scanner)
+   - 7.4 IST Nightly Auto-Cancellation & No-Show Cron Engine
+   - 7.5 Staff Shift Clock-In / Clock-Out Attendance System
+   - 7.6 Owner Billing & Client PDF Invoicing with jspdf-autotable
+   - 7.7 30-Day Financial Analytics & Staff Revenue Contribution Reports
+   - 7.8 Promotional Campaigns & Offers Engine
+8. UI/UX DESIGN SYSTEM, DESIGN TOKENS & TYPOGRAPHY
+9. COMPLETE STEP-BY-STEP IMPLEMENTATION PLAN (Phase 1 to Phase 10)
+10. THE MASTER REPLICATION PROMPT (Prompt for LLMs / Engineering Teams)
+
+====================================================================================================
+1. THE SOUL, IDENTITY & PRODUCT MANIFESTO
+====================================================================================================
+Glow & Glamour is not a generic booking tool or administrative CRM. It is a digital sanctuary 
+bridging two worlds:
+1. The serene, high-end luxury of an artisanal Indian beauty studio (Ayurvedic botanical hair care, 
+   luxurious facials, bridal rituals, precision restyles).
+2. An uncompromising, modern, automated business engine where appointment conflicts, missed 
+   tickets, and manual chaos do not exist.
+
+The Brand Soul:
+- Aesthetic Tone: Warm, editorial, tranquil, minimalist luxury. It takes inspiration from Vogue, 
+  high-end boutique apothecary packaging, and 5-star spa retreats.
+- Visual Language: Warm charcoal typography, champagne gold accents (#E5D3B3), soft ivory/sand 
+  surfaces, crisp micro-borders (0.15rem radius), and rich photographic showcases of human artistry.
+- Emotional Vibe: From the moment a guest visits the website, they must feel calm, respected, and 
+  pampered. When they book, they receive not a simple plain-text email, but a beautifully crafted 
+  digital boarding pass / luxury ticket complete with a verifiable QR code.
+- Operational Soul: Behind the tranquil guest-facing facade lies an ultra-lean, disciplined 
+  business engine. The Owner can see today's revenue and appointments at a glance, issue formal 
+  tax invoices, and scan incoming guests in 2 seconds with a smartphone camera. The Staff have 
+  a single clean screen to see their day's schedule and clock their shifts.
+
+====================================================================================================
+2. THE UNIFIED ARCHITECTURAL PRINCIPLE ("Three Interfaces, One Source of Truth")
+====================================================================================================
+A fundamental rule governs this entire codebase:
+THERE ARE THREE INTERFACES, BUT NEVER THREE SEPARATE SYSTEMS.
+
+                                 +-----------------------+
+                                 |    GLOW & GLAMOUR     |
+                                 |   SINGLE FIRESTORE    |
+                                 +-----------+-----------+
+                                             |
+                   +-------------------------+-------------------------+
+                   |                         |                         |
+        +----------v----------+   +----------v----------+   +----------v----------+
+        |   CUSTOMER PORTAL   |   |      OWNER CRM      |   |      STAFF CRM      |
+        |  (Public + Private) |   |  (Executive Suite)  |   |    (Operations)     |
+        +----------+----------+   +----------+----------+   +----------+----------+
+                   |                         |                         |
+                   +-------------------------+-------------------------+
+                                             |
+                            SINGLE APPOINTMENT RECORD LIFECYCLE
+               Booked -> Confirmed -> In Progress -> Completed / No Show / Cancelled
+
+When Customer Rahul books a Haircut at 5:00 PM:
+1. Exactly ONE record is created in the `appointments` collection.
+2. Rahul sees it immediately in his Customer Dashboard and gets a downloadable QR Ticket.
+3. The Owner sees Rahul on the Owner Appointments schedule and Dashboard metrics.
+4. The assigned Stylist sees Rahul on their personal Staff daily schedule.
+5. If the Owner or Staff marks the appointment "Completed", Rahul's ticket status updates instantly.
+There are NO duplicate records, synchronizing scripts, or fragmented silos.
+
+====================================================================================================
+3. THE FREE-FIRST ARCHITECTURE PHILOSOPHY
+====================================================================================================
+The system is intentionally engineered to operate at approximately ₹0 per month during early and 
+single-salon operations:
+- Firebase Free Spark / Pay-as-you-go Blaze Tier (Firestore, Auth, and Storage stay well within free quotas).
+- Vercel Free Tier (Hosting Next.js Server Actions and Route Handlers).
+- Brevo Free Tier (Transactional Email delivery up to 300 free emails per day).
+- Client-Side & Serverless PDF Generation (Using `jspdf` and `qrcode` without costly third-party PDF APIs).
+- Hardware-Free Barcode / Ticket Scanning (Using WebRTC camera feed via `html5-qrcode` in browser—no 
+  dedicated barcode hardware scanner required).
+- Fallback-First Design: If an external service is unavailable (e.g., Brevo API quota exceeded), the 
+  core booking flow never crashes; it logs the condition gracefully and fulfills the client request.
+
+====================================================================================================
+4. SYSTEM ARCHITECTURE & FULL TECH STACK
+====================================================================================================
+Core Framework:
+- Next.js 15+ / 16 (App Router, Server Actions, Route Handlers)
+- React 19 / TypeScript 5 (Strict Mode, End-to-End Type Safety)
+
+Styling & UI Library:
+- Tailwind CSS v4 + @tailwindcss/postcss
+- shadcn/ui components (Card, Button, Input, Table, DropdownMenu, Select, Badge, Label)
+- Lucide React (Minimalist luxury icon set)
+- tw-animate-css & Sonner (Silky micro-animations and toast notifications)
+- Typography: Next.js Google Fonts `Inter` (sans UI) + `Lora` (editorial serif headings)
+
+Backend & Database:
+- Cloud Firestore (NoSQL document store with strict indexes and validation)
+- Firebase Admin SDK (Privileged server actions, custom claims, server-side data mutations)
+- Firebase Client SDK (Client-side listeners, reactive user auth state)
+
+Authentication & Authorization:
+- Firebase Authentication (Email/Password authentication, Password Reset)
+- Firebase Custom User Claims:
+  - `role: "customer"` (Default public user)
+  - `role: "staff"` (Salon employee)
+  - `role: "owner"` (Salon proprietor - strictly single owner enforced)
+  - `role: "developer"` (System engineer with special administrative VIP badges)
+
+External Services & Libraries:
+- Brevo (formerly Sendinblue) Transactional API (Direct REST endpoint over fetch)
+- jsPDF + jspdf-autotable (Client and server PDF generation)
+- qrcode & qrcode.react (QR generation)
+- html5-qrcode (Live browser camera QR scanning)
+- Zod (Schema validation for runtime safety)
+
+====================================================================================================
+5. COMPLETE DATABASE SCHEMAS & FIRESTORE RULES
+====================================================================================================
+
+COLLECTION: `customers`
+Document ID: Firebase Auth UID (for registered users) OR Auto-generated Doc ID (for guests)
+Fields:
+- `id`: string (Document ID)
+- `userId`: string? (Firebase Auth UID if registered)
+- `uniqueId`: string? (8-character alphanumeric identifier, e.g. "K9#mQ2!a")
+- `isGuest`: boolean (true for walk-ins/guest bookings, false for registered accounts)
+- `name`: string (Full customer name)
+- `phone`: string? (Contact number)
+- `email`: string? (Email address)
+- `location`: string? (Customer city/neighborhood)
+- `gender`: string? ("female" | "male" | "other" | "prefer_not_to_say")
+- `birthday`: string? (YYYY-MM-DD for salon birthday greetings)
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+COLLECTION: `staff`
+Document ID: Auto ID or Staff User UID
+Fields:
+- `id`: string (Document ID)
+- `customerId`: string (References the corresponding `customers` doc ID)
+- `userId`: string (Firebase Auth UID of the staff user)
+- `isActive`: boolean (true if currently on staff roster)
+- `services`: array<string> (Array of `services` doc IDs this staff member is trained to perform)
+- `workingHours`: object? (Schedule configuration placeholder)
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+COLLECTION: `services`
+Document ID: Auto-generated Doc ID
+Fields:
+- `id`: string (Document ID)
+- `name`: string (e.g. "Hydra Facial", "Hair Botox", "Balayage Elegance")
+- `category`: string (e.g. "Skin Care", "Hair Care", "Waxing", "Threading", "Nail Care", "Hair Treatments")
+- `description`: string (Comprehensive description of the treatment)
+- `price`: number (Positive integer / float in INR ₹)
+- `durationMinutes`: number (Estimated service duration in minutes, e.g. 30, 45, 60, 120)
+- `isActive`: boolean (Default: true; if false, hidden from public reservation picker)
+- `imageUrl`: string? (Optional service asset URL)
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+COLLECTION: `appointments`
+Document ID: Auto-generated Doc ID (Used as the Booking ID and encoded into the QR code)
+Fields:
+- `id`: string (Document ID)
+- `customerId`: string (References `customers` doc ID)
+- `serviceId`: string (References `services` doc ID)
+- `staffId`: string? (References `staff` doc ID; null if unassigned)
+- `date`: string (Format: YYYY-MM-DD)
+- `startTime`: string (Format: 24h "HH:MM", e.g. "14:30")
+- `durationMinutes`: number (Duration copied from service at booking time)
+- `status`: "Booked" | "Confirmed" | "In Progress" | "Completed" | "Cancelled" | "No Show" | "Rescheduled"
+- `source`: "website" | "owner" | "phone" | "walk_in" | "whatsapp" | "instagram" | "staff" | "other"
+- `notes`: string? (Customer notes / special preferences)
+- `priceAtBooking`: number (Locked-in price snapshot in ₹ at time of booking)
+- `customerRole`: string? ("developer" | "customer" - used to highlight VIP developer bookings)
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+COLLECTION: `attendance_shifts`
+Document ID: Auto-generated Doc ID
+Fields:
+- `id`: string (Document ID)
+- `staffId`: string (References `staff` doc ID)
+- `date`: string (Format: YYYY-MM-DD)
+- `clockInTime`: timestamp (Clock-in timestamp)
+- `clockOutTime`: timestamp? (Clock-out timestamp)
+- `status`: "Active" | "Completed"
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+COLLECTION: `offers`
+Document ID: Auto-generated Doc ID
+Fields:
+- `id`: string (Document ID)
+- `title`: string (e.g. "Festive Glow Package", "Monsoon Keratin Special")
+- `description`: string (Full offer terms)
+- `features`: array<string>? (Bulleted perks)
+- `price`: number? (Discounted price)
+- `originalPrice`: number? (Standard price before discount)
+- `discountPercentage`: number?
+- `discountAmount`: number?
+- `validUntil`: string? (Expiry date YYYY-MM-DD)
+- `type`: "festive" | "newest" | "standard"
+- `imageUrl`: string?
+- `code`: string? (Promo code)
+- `isActive`: boolean (Default: true)
+- `createdAt`: serverTimestamp
+- `updatedAt`: serverTimestamp
+
+----------------------------------------------------------------------------------------------------
+FIRESTORE SECURITY RULES (`firestore.rules`):
+----------------------------------------------------------------------------------------------------
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner() { return isAuthenticated() && request.auth.token.role == 'owner'; }
+    function isStaff() { return isAuthenticated() && request.auth.token.role == 'staff'; }
+    function isCustomer(userId) { return isAuthenticated() && request.auth.uid == userId; }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+    
+    match /customers/{customerId} {
+      allow read: if (isAuthenticated() && request.auth.uid == customerId) || isOwner() || isStaff();
+      allow write: if (isAuthenticated() && request.auth.uid == customerId) || isOwner();
+    }
+    
+    match /staff/{staffId} {
+      allow read: if resource.data.isActive == true || isOwner() || isStaff();
+      allow write: if isOwner();
+    }
+    
+    match /appointments/{appointmentId} {
+      allow create: if isOwner() || isStaff() || isCustomer(request.resource.data.customerId) || !isAuthenticated();
+      allow read: if isOwner() || isStaff() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
+      allow update: if isOwner() || isStaff() || (isAuthenticated() && resource.data.customerId == request.auth.uid && request.resource.data.status == 'Cancelled');
+      allow delete: if isOwner();
+    }
+    
+    match /attendance_shifts/{shiftId} {
+      allow read, write: if isOwner() || isStaff();
+    }
+
+    match /offers/{offerId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+====================================================================================================
+6. AUTHENTICATION, ROLES & SECURITY ENGINE
+====================================================================================================
+Role Hierarchy:
+1. `owner`: Has absolute management control over all salon operations, finances, catalog, staff.
+   - Strictly SINGLE OWNER rule. System checks `adminAuth.listUsers` before assigning owner claim.
+2. `staff`: Operates daily appointments queue, attendance shift punch clock, status progression.
+   - Staff cannot self-register. Appointed by Owner or via Developer provisioning.
+3. `customer`: Regular public user. Can be Guest (unauthenticated) or Registered.
+   - Registered customers receive an 8-character unique ID, saved booking history, profile details.
+4. `developer`: System maintenance role. Access to `/developer` for claiming roles.
+   - Special privilege: appointments created by developer users are given high-visibility 
+     gold-amber highlighting in the CRM table.
+
+Role Provisioning Engine (`/api/dev/set-role`):
+- Protected by a secret developer passphrase (`DEV_SECRET_KEY`).
+- Validates that developer role can only be assigned to the designated master developer email.
+- Enforces single-owner constraint: returns error if another owner already exists.
+- Sets custom claims via `adminAuth.setCustomUserClaims(user.uid, { role })`.
+- Auto-provisions a corresponding document in the `staff` collection if `role === 'staff'`.
+
+Client-Side Role Protection:
+- `RoleGuard`: Reusable wrapper component that checks user role against required permission list 
+  and redirects unauthorized users.
+- Role-based redirect on login:
+  - Owner -> `/owner`
+  - Staff -> `/staff`
+  - Customer -> `/customer`
+
+====================================================================================================
+7. END-TO-END BUSINESS LOGIC & CRITICAL FLOWS
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+7.1 DYNAMIC RESERVATION & STAFF CONFLICT-RESOLUTION ALGORITHM (`createBooking` Action)
+----------------------------------------------------------------------------------------------------
+Workflow:
+1. Validates that the requested service exists and has `isActive: true`.
+2. Customer Identity Resolution:
+   - If user is logged in (`userId`), links appointment to customer's account.
+   - If guest, queries `customers` collection by email. If an existing record matches, reuses it.
+     Otherwise, creates a new guest record with `isGuest: true`.
+3. Candidate Staff Selection:
+   - Queries `staff` where `isActive == true` and `services array-contains serviceId`.
+   - If no staff member is specifically designated for this service, falls back to any active staff.
+4. Slot Conflict Check:
+   - Converts requested start time "HH:MM" into minutes from midnight: `reqStart = hours * 60 + mins`.
+   - Computes `reqEnd = reqStart + service.durationMinutes`.
+   - Fetches all existing appointments on the target date where status in `['Booked', 'Confirmed', 'In Progress']`.
+   - Iterates through candidate staff members: checks if any of their booked appointments overlap:
+     `Overlap condition: (reqStart < existingEnd) && (reqEnd > existingStart)`.
+   - Assigns the first conflict-free staff member. If all candidate staff members are occupied,
+     gracefully halts and informs the user that the slot is fully booked.
+5. Record Creation:
+   - Writes the appointment to Firestore with locked `priceAtBooking`.
+6. Email & Ticket Dispatch:
+   - Calls `sendBookingConfirmationEmail` with generated base64 PDF ticket.
+
+----------------------------------------------------------------------------------------------------
+7.2 BREVO TRANSACTIONAL EMAIL ENGINE & BASE64 PDF TICKET GENERATION (`brevoEmailService.ts`)
+----------------------------------------------------------------------------------------------------
+Ticket Design (Generated using `jspdf`):
+- Dimensions: Standard A4 canvas.
+- Header: Dark Charcoal banner (`#2B2B2B`) with centered white typography "Glow & Glamour Hair Studio".
+- Title Banner: Light grey card with "OFFICIAL BOOKING TICKET".
+- Left Column: Service name (22pt bold), Date, Time formatted in 12-hour AM/PM, Salon Address.
+- Right Column: High-density scannable QR Code containing the Appointment ID, caption "SCAN TO VERIFY".
+- Mid-Section: Hairline rule, Guest Name, Locked Amount in ₹, Assigned Staff member.
+- Lower Badges: Alice Blue badge with shortened 12-char Booking ID, Light Green badge with Status.
+- Footer: "Present this digital ticket at the front desk upon arrival."
+
+Brevo REST Integration:
+- Uses standard fetch to `https://api.brevo.com/v3/smtp/email` with header `api-key: process.env.BREVO_API_KEY`.
+- Payload includes sender, recipient, rich HTML email layout, and `attachment` array containing 
+  the base64 PDF string titled `Booking-[APPOINTMENT_ID].pdf`.
+- Fail-Safe Guarantee: Entire email dispatch is wrapped in try/catch. A mail failure never aborts 
+  or rolls back a confirmed booking.
+
+----------------------------------------------------------------------------------------------------
+7.3 REAL-TIME CAMERA QR CODE TICKET VERIFICATION (`/owner/scanner`)
+----------------------------------------------------------------------------------------------------
+- Uses `html5-qrcode` to bind directly to the device's camera (smartphone or laptop webcam) 
+  inside an interactive frame (250x250 scanning window).
+- Features manual Booking ID text fallback if camera permissions are blocked.
+- On QR decode:
+  1. Captures the decoded string (Appointment ID).
+  2. Queries Firestore `appointments` by ID.
+  3. Hydrates the appointment with Customer Name and Service Name.
+  4. Displays a verification card with booking summary, price, and current status.
+  5. Provides a 1-click button: "Mark as Completed", which updates status to "Completed" 
+     and notifies via toast.
+
+----------------------------------------------------------------------------------------------------
+7.4 IST NIGHTLY AUTO-CANCELLATION & NO-SHOW CRON ENGINE (`/api/cron/auto-cancel`)
+----------------------------------------------------------------------------------------------------
+- Scheduled API endpoint triggered nightly via cron scheduler (Vercel Cron / GitHub Action / Cloud Scheduler).
+- Timezone Awareness: Calculates India Standard Time (`Asia/Kolkata`) current date and hour.
+- Cancellation Criteria:
+  - Any active appointment ("Booked", "Confirmed", "In Progress") where `date < todayStr` (past date).
+  - Any appointment where `date === todayStr` and `currentHourIST >= 20` (salon closing time: 8:00 PM).
+- Actions:
+  - Updates appointment status to "No Show".
+  - Sends a polite auto-cancellation email to the customer via Brevo, explaining that the salon has 
+    closed for the day and inviting them to rebook.
+
+----------------------------------------------------------------------------------------------------
+7.5 STAFF SHIFT CLOCK-IN / CLOCK-OUT ATTENDANCE SYSTEM (`/staff` + Server Actions)
+----------------------------------------------------------------------------------------------------
+- Every staff member has an operational dashboard at `/staff`.
+- Daily Attendance:
+  - "Clock In" action creates a record in `attendance_shifts` for `todayStr` with `status: 'Active'` 
+    and server timestamp. Prevents duplicate clock-ins.
+  - "Clock Out" action stamps `clockOutTime`, marks status as `'Completed'`, and updates record.
+- Daily Roster:
+  - Fetches today's appointments specifically assigned to the logged-in staff member.
+  - Displays customer name, service name, time, and quick status action triggers (e.g. "In Progress", "Completed").
+
+----------------------------------------------------------------------------------------------------
+7.6 OWNER BILLING & CLIENT PDF INVOICING (`/owner/billing`)
+----------------------------------------------------------------------------------------------------
+- Lists completed appointments.
+- Provides two invoice actions:
+  1. "Download Invoice" (Saves PDF to user machine).
+  2. "Print Invoice" (Opens print dialog in new window).
+- Invoice Generation Engine:
+  - Uses `jspdf` + `jspdf-autotable`.
+  - Professional invoice header: Salon Name, Address, Contact, Official Invoice Number (`INV-[SHORT_ID]`).
+  - Bill-To block with Customer Name, Email, Phone.
+  - Formatted striped table with Service Description, Time Slot, and Total Amount in ₹.
+  - Official sign-off footer: "Thank you for your business!".
+
+----------------------------------------------------------------------------------------------------
+7.7 30-DAY FINANCIAL ANALYTICS & STAFF REVENUE CONTRIBUTION (`/owner/reports`)
+----------------------------------------------------------------------------------------------------
+- Aggregates completed appointments over the rolling 30-day window.
+- Computes:
+  - Total 30-day gross revenue.
+  - Daily revenue breakdown (Date, appointment count, daily total ₹).
+  - Staff performance breakdown: tracks which staff members generated how much revenue and completed 
+    how many appointments.
+
+----------------------------------------------------------------------------------------------------
+7.8 PROMOTIONAL CAMPAIGNS & OFFERS ENGINE (`/owner/offers` & `/offers`)
+----------------------------------------------------------------------------------------------------
+- Owner CRM allows adding and managing promotional campaigns (title, description, discount %, 
+  valid-until date, offer type: "festive" | "newest" | "standard").
+- Public Offers page (`/offers`) displays high-fashion promotional cards with active discount badges, 
+  original vs discount pricing, and direct "Claim Offer / Book Now" buttons.
+
+====================================================================================================
+8. UI/UX DESIGN SYSTEM, DESIGN TOKENS & TYPOGRAPHY
+====================================================================================================
+
+Typography:
+- Heading Font: `Lora` (Google Fonts, serif, variable `--font-heading`). Evokes luxury magazines, 
+  perfume labels, classical elegance.
+- Body / UI Font: `Inter` (Google Fonts, sans-serif, variable `--font-sans`). Crisp, modern, legible.
+
+Color Tokens (OKLCH Color Space in `globals.css`):
+- Background: `oklch(1 0 0)` (Pure pristine white)
+- Foreground: `oklch(0.25 0.02 40)` (Deep warm charcoal, avoiding harsh pure black)
+- Primary: `oklch(0.2 0.01 40)` (Rich midnight charcoal)
+- Secondary: `oklch(0.93 0.02 60)` (Soft warm sand / beige)
+- Muted: `oklch(0.96 0.01 60)` (Subtle warm stone)
+- Accent: `oklch(0.93 0.02 60)`
+- Brand Gold: `#E5D3B3` (Soft champagne gold used in Hero highlights and CTAs)
+- Border Radius: `0.15rem` (Distinctive, sharp, architectural luxury corners—not bubble-like curves)
+
+Layouts & Navigation:
+- Public Header: Frosted translucent navbar (`bg-white/90 backdrop-blur-md`), tall 24-unit height, 
+  minimalist wordmark "Glow & Glamour", uppercase wide-tracked navigation links (`tracking-[0.2em]`).
+- Public Hero: Immersive 85vh photography backdrop with black-to-transparent luxury gradient overlay, 
+  editorial serif headline ("Elevate Your Natural Beauty"), champagne gold CTA buttons.
+- Customer Dashboard: Exclusive member greeting, statistics cards, upcoming appointments with 
+  direct "View Ticket" links, past history, and profile management.
+- Owner CRM: Minimalist dark charcoal sidebar navigation, quick tab switcher, high-density data tables.
+
+====================================================================================================
+9. COMPLETE STEP-BY-STEP IMPLEMENTATION PLAN
+====================================================================================================
+
+Phase 1: Project Initialization & Tooling
+1. Scaffold Next.js 15/16 with TypeScript and Tailwind CSS v4.
+2. Configure Google Fonts (Inter + Lora) in `layout.tsx`.
+3. Set up `globals.css` with the OKLCH luxury color palette and custom border radius.
+4. Install dependencies:
+   - `firebase`, `firebase-admin`
+   - `@getbrevo/brevo`, `jspdf`, `jspdf-autotable`, `qrcode`, `qrcode.react`, `html5-qrcode`
+   - `lucide-react`, `sonner`, `zod`, `class-variance-authority`, `clsx`, `tailwind-merge`
+5. Configure `components.json` and initialize shadcn primitives.
+
+Phase 2: Data Models & Environment Setup
+1. Define shared types and Zod schemas in `src/lib/types/index.ts`.
+2. Configure Firebase Client (`src/lib/firebase/client.ts`) and Firebase Admin (`src/lib/firebase/admin.ts`).
+3. Set up environment variables in `.env.local` (Client keys, Admin private key & client email, Brevo API key).
+4. Write and deploy `firestore.rules`.
+
+Phase 3: Authentication & Role Engine
+1. Implement `AuthContext.tsx` with `onAuthStateChanged` listening to token claims.
+2. Build `RoleGuard.tsx` to secure routes based on user role.
+3. Build public `/login` and `/register` pages with luxury split-screen imagery.
+4. Implement `/api/dev/set-role` for custom claims management.
+
+Phase 4: Public Marketing Experience
+1. Build public layout (`src/app/(public)/layout.tsx`) with luxury sticky header and footer.
+2. Create Homepage (`/`) with Hero section, Collection preview, Testimonial cards, and Location map.
+3. Create Treatments page (`/treatments`) with category filtering and prices.
+4. Create Our Story page (`/our-story`) with brand philosophy and imagery.
+5. Create Offers page (`/offers`) displaying active promotional cards.
+
+Phase 5: Reservation & Booking System
+1. Build `/reservations` with interactive service selection, rolling 14-day calendar, and 30-min time slots.
+2. Implement server action `createBooking`:
+   - Guest vs Registered customer resolution.
+   - Staff capability matching and conflict-free slot allocation.
+   - Firestore appointment record insertion.
+
+Phase 6: Ticket Generation & Brevo Email Dispatch
+1. Implement `brevoEmailService.ts`:
+   - Canvas PDF builder with `jspdf` containing booking details, styling, and QR code.
+   - REST call to Brevo API with HTML email body and attached PDF.
+2. Build Digital Ticket view (`/customer/bookings/[id]`) with client-side SVG QR code and print options.
+
+Phase 7: Front-Desk QR Ticket Scanner
+1. Build `/owner/scanner` utilizing `html5-qrcode`.
+2. Implement live camera decode, real-time ticket lookup, and 1-click status completion.
+3. Add manual Booking ID search fallback.
+
+Phase 8: Staff Operations & Attendance
+1. Build `/staff` dashboard for salon employees.
+2. Implement server actions `clockIn` and `clockOut` managing `attendance_shifts`.
+3. Display daily assigned appointments with status update controls.
+
+Phase 9: Owner CRM & Financial Management
+1. Build `/owner` executive dashboard with daily KPIs.
+2. Build `/owner/appointments` with date selector, staff assignment, and status updates.
+3. Build `/owner/services` for service catalog CRUD.
+4. Build `/owner/staff` for staff assignment and activation.
+5. Build `/owner/billing` for PDF invoice generation and printing.
+6. Build `/owner/reports` for 30-day analytics and staff revenue contribution.
+7. Build `/owner/offers` for promotional campaign management.
+
+Phase 10: Automation, Hardening & Deployment
+1. Build `/api/cron/auto-cancel` for nightly IST no-show processing and customer notifications.
+2. Configure Vercel deployment with environment secrets.
+3. Run comprehensive verification across all three interfaces using a single test appointment.
+
+====================================================================================================
+10. THE MASTER REPLICATION PROMPT (Prompt for LLMs / Engineering Teams)
+====================================================================================================
+Copy and paste the exact prompt below into any frontier AI coding assistant to generate or recreate 
+the exact identical platform from scratch:
+
+"""
+You are tasked with building the complete, production-ready web platform for "Glow & Glamour Salon & Spa" 
+from scratch. This is a unified, high-end salon web ecosystem that features one shared Cloud Firestore 
+database serving three role-specific interfaces:
+1. Public Customer Website & Booking Portal (Minimalist luxury spa aesthetic).
+2. Owner CRM (Executive business suite, billing, analytics, staff & service management, ticket scanner).
+3. Staff CRM (Operational schedule, appointment status progression, clock-in/out attendance).
+
+CRITICAL ARCHITECTURAL RULES:
+1. THREE INTERFACES, ONE SOURCE OF TRUTH: Never create separate databases or duplicate appointment 
+   records. An appointment booked by a customer is the exact same record viewed and managed by the 
+   Owner and Staff.
+2. FREE-FIRST ARCHITECTURE: Operate within free-tier capabilities (Firebase free tier, Vercel free 
+   hosting, Brevo free tier for transactional emails, client-side camera QR scanning via html5-qrcode, 
+   jsPDF for client and server PDF generation). No paid API dependencies.
+3. LUXURY EDITORIAL DESIGN: The public website must feel like a world-class beauty sanctuary. Use 
+   Google Fonts Inter (sans UI) and Lora (editorial serif headings). Use an OKLCH luxury palette: 
+   warm charcoal text, pure white and warm sand surfaces, soft champagne gold accents (#E5D3B3), 
+   and crisp 0.15rem border radiuses. Avoid generic colors or casual design.
+
+TECH STACK:
+- Next.js (App Router, Server Actions, Route Handlers) with TypeScript and Tailwind CSS v4.
+- Firebase Auth (Email/Password + Custom Claims: 'customer', 'staff', 'owner', 'developer').
+- Cloud Firestore with Firebase Admin SDK for server actions and Firebase Client SDK for reactive UI.
+- Brevo (Sendinblue) Transactional REST API v3 for sending booking confirmation emails with attached PDFs.
+- jsPDF and jspdf-autotable for PDF booking tickets and PDF tax invoices.
+- qrcode and qrcode.react for QR code generation; html5-qrcode for live camera ticket scanning.
+- Lucide React icons, Sonner toasts, Zod schema validation, shadcn/ui primitives.
+
+DATA COLLECTIONS TO IMPLEMENT:
+- `customers`: { id, userId?, uniqueId?, isGuest, name, phone?, email?, location?, gender?, birthday?, createdAt, updatedAt }
+- `staff`: { id, customerId, userId, isActive, services: string[], workingHours?, createdAt, updatedAt }
+- `services`: { id, name, category, description, price, durationMinutes, isActive, imageUrl?, createdAt, updatedAt }
+- `appointments`: { id, customerId, serviceId, staffId?, date (YYYY-MM-DD), startTime (HH:MM), durationMinutes, status ('Booked'|'Confirmed'|'In Progress'|'Completed'|'Cancelled'|'No Show'|'Rescheduled'), source, notes?, priceAtBooking, customerRole?, createdAt, updatedAt }
+- `attendance_shifts`: { id, staffId, date (YYYY-MM-DD), clockInTime, clockOutTime?, status ('Active'|'Completed'), createdAt, updatedAt }
+- `offers`: { id, title, description, features?, price?, originalPrice?, discountPercentage?, discountAmount?, validUntil?, type ('festive'|'newest'|'standard'), imageUrl?, code?, isActive, createdAt, updatedAt }
+
+CORE FEATURES & FLOWS TO CODE:
+1. Public Customer Experience:
+   - Sticky frosted header with brand wordmark and uppercase tracked nav links.
+   - Luxury Hero section with photography, headline, and champagne gold CTAs.
+   - Curated treatments showcase, brand philosophy ("Our Story"), and active offers page.
+   - Luxury split-screen Login and Registration pages (Customer registration assigns an 8-char unique ID).
+2. Intelligent Booking System (`/reservations` & Server Action `createBooking`):
+   - Supports both authenticated customers and guest bookings (auto-links returning guests by email).
+   - Allows choosing from active services, picking dates from a rolling 14-day calendar, and selecting 
+     30-minute slots between 9:00 AM and 7:30 PM.
+   - Automatically finds active staff capable of performing the selected service and performs conflict-free 
+     overlap checking. If all candidate staff are occupied, prompts user to select another slot.
+   - Generates an official Base64 PDF Booking Ticket with salon details, customer name, price, and a scannable 
+     QR Code (Appointment ID).
+   - Sends the PDF ticket via Brevo transactional email API with bulletproof fail-soft error handling.
+3. Customer Dashboard (`/customer`):
+   - Member greeting, upcoming appointment cards with quick "View Ticket" button, past visit history, 
+     profile management, and settings.
+   - Digital Ticket Page (`/customer/bookings/[id]`): Displays luxury digital boarding pass with SVG QR code, 
+     verified booking details, and print capability.
+4. Front-Desk QR Ticket Scanner (`/owner/scanner`):
+   - Uses device camera via `html5-qrcode` to scan incoming tickets in real time.
+   - Decodes appointment ID, fetches booking + service + customer data, and offers 1-click "Mark Completed".
+   - Includes manual ID search fallback.
+5. Staff CRM (`/staff`):
+   - Daily schedule view displaying only appointments assigned to the logged-in staff member.
+   - Shift Attendance punch clock: Clock-In and Clock-Out buttons linked to `attendance_shifts`.
+   - Instant status toggles for in-progress appointments.
+6. Owner CRM (`/owner`):
+   - Executive Dashboard with today's appointments count, estimated revenue, active staff, and customer total.
+   - Daily Appointments table with date picker filter, staff assignment dropdown, and status progression.
+   - Service Catalog management (Add, edit, toggle active status, category grouping).
+   - Staff roster management and service assignments.
+   - Billing & Invoice generator: Generates professional PDF invoices (`INV-[SHORT_ID]`) with 
+     `jspdf-autotable` and direct print options.
+   - 30-Day Financial Reports: Rolling gross revenue, daily revenue table, and staff revenue contribution breakdown.
+   - Offers & Discounts manager: Publish promotional campaigns.
+7. Nightly Auto-Cancel Cron (`/api/cron/auto-cancel`):
+   - Evaluates active appointments in India Standard Time (`Asia/Kolkata`).
+   - Automatically marks expired or past 8:00 PM same-day uncompleted appointments as "No Show".
+   - Dispatches polite auto-cancellation notification email to the customer via Brevo.
+8. Role Management & Security:
+   - Deploy strict `firestore.rules` enforcing role-based read/write access.
+   - Dedicated `/api/dev/set-role` endpoint protected by `DEV_SECRET_KEY` to grant Owner, Staff, 
+     or Developer roles.
+   - Developer appointments highlighted with gold VIP accents in CRM queues.
+
+Write clean, modular, production-ready TypeScript code across all components, actions, and routes.
+"""
+
+====================================================================================================
+END OF SOUL.TXT
+====================================================================================================

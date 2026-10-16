@@ -48,4 +48,13 @@ function initializeFirebaseAdmin() {
 initializeFirebaseAdmin();
 
 export const adminMessaging = getApps().length > 0 ? getMessaging() : null as any;
-export const adminDb = getApps().length > 0 ? getFirestore() : null as any;
+
+const db = getApps().length > 0 ? getFirestore() : null as any;
+if (db) {
+  try {
+    db.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // Settings already locked or initialized
+  }
+}
+export const adminDb = db;

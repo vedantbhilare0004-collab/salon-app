@@ -49,15 +49,15 @@ export function ServiceCatalog({ services }: { services: Service[] }) {
                       {svc.category}
                     </div>
                     <h3 className="font-display text-3xl font-bold leading-tight shadow-black/50 drop-shadow-md sm:text-4xl">
-                      {svc.name}
+                      {svc.name} {svc.variant ? `(${svc.variant})` : ""}
                     </h3>
                     <div className="mt-4 flex items-center gap-6">
                       <div className="text-2xl font-semibold text-emerald-400">
-                        ₹{svc.price}
+                        ₹{svc.price.toLocaleString("en-IN")}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-300">
                         <Clock className="h-4 w-4" />
-                        <span>{svc.durationMin} mins</span>
+                        <span>{svc.durationMin || svc.durationMinutes || 30} mins</span>
                       </div>
                     </div>
                   </div>

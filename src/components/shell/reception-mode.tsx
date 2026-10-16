@@ -82,27 +82,26 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-12">
-      <header className="sticky top-0 z-20 flex flex-wrap items-center gap-2 border-b border-border bg-background/95 px-3 py-3 backdrop-blur sm:px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground">
+    <div className="min-h-screen bg-[#F6F3ED] text-[#302A24] pb-12 animate-in fade-in duration-200">
+      <header className="sticky top-0 z-20 flex flex-wrap items-center gap-2 border-b border-[#E9E1D6] bg-[#FFFDFA] px-3 py-3 shadow-2xs sm:px-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#A27C48] font-semibold text-sm text-white">
           G
         </div>
         <div className="leading-tight">
-          <p className="font-display text-sm font-semibold">Reception · {BRANCH_LABELS[bid]}</p>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="font-semibold text-sm text-[#302A24]">Reception Console · Glow & Glamour</p>
+          <p className="text-[11px] text-[#74695E]">
             {status.isOpen ? "Open" : "Closed"} · {status.waitingCount} waiting · ~{status.estimatedWaitMin}m Wait
           </p>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <BranchSwitcher className="h-9 max-w-[42vw]" />
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => setCatalogOpen(true)}>
-            <LayoutGrid className="h-4 w-4" /> Catalog
+          <Button variant="outline" size="sm" className="gap-2 rounded-md border-[#E9E1D6] text-[#302A24] hover:bg-[#F0EBE3] text-xs h-9" onClick={() => setCatalogOpen(true)}>
+            <LayoutGrid className="h-3.5 w-3.5 text-[#A27C48]" /> Catalog
           </Button>
-          <Button variant="default" size="sm" className="gap-2" onClick={() => setWalkOpen(true)}>
-            <Plus className="h-4 w-4" /> Check-In
+          <Button variant="default" size="sm" className="gap-2 rounded-md bg-[#A27C48] hover:bg-[#876438] text-white text-xs h-9 shadow-xs transition-colors" onClick={() => setWalkOpen(true)}>
+            <Plus className="h-3.5 w-3.5" /> Check-In
           </Button>
-          <Button variant="ghost" size="icon" onClick={onExit} aria-label="Exit reception">
-            <X className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md text-[#74695E] hover:text-[#302A24] hover:bg-[#F0EBE3]" onClick={onExit} aria-label="Exit reception">
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </header>
@@ -110,33 +109,33 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
       <div className="mx-auto grid max-w-7xl gap-4 p-3 sm:p-6 lg:grid-cols-2">
         {/* Left Column: Live Queue */}
         <div className="space-y-4">
-          <Card className="overflow-hidden p-5 shadow-sm border-emerald-100 bg-emerald-50/30 dark:bg-emerald-950/10 dark:border-emerald-900/30">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-300">
+          <Card className="overflow-hidden p-5 shadow-xs border border-[#E9E1D6] bg-[#FFFDFA] rounded-md">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#355B3C]">
               In Service ({inServiceList.length} / {status.totalChairs})
             </h2>
             {inServiceList.length === 0 ? (
-              <p className="rounded-xl bg-emerald-100/50 px-4 py-8 text-center text-sm text-emerald-700/70 dark:bg-emerald-900/20 dark:text-emerald-400">
+              <p className="rounded-md bg-[#F0EBE3]/50 px-4 py-8 text-center text-xs text-[#74695E]">
                 No active services right now.
               </p>
             ) : (
               <ul className="space-y-2">
                 {inServiceList.map((q) => (
-                  <li key={q.id} className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-white p-3 shadow-sm dark:border-emerald-800/50 dark:bg-emerald-950/40">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400">
-                      <MonitorDot className="h-5 w-5" />
+                  <li key={q.id} className="flex items-center gap-3 rounded-md border border-[#E9E1D6] bg-[#F6F3ED]/30 p-3 shadow-2xs">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#E0EBDD] text-[#355B3C]">
+                      <MonitorDot className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-emerald-950 dark:text-emerald-50">{q.customerName}</p>
-                      <p className="text-xs text-emerald-700/80 dark:text-emerald-400/80">
+                      <p className="truncate font-semibold text-sm text-[#302A24]">{q.customerName}</p>
+                      <p className="text-xs text-[#74695E]">
                         Started at {new Date(q.serviceStartTime!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                     <Button
                       size="sm"
-                      className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                      className="gap-1 bg-[#355B3C] hover:bg-[#2c4c32] text-white rounded-md text-xs h-8"
                       onClick={run(() => completeAppointment(q.appointmentId!), `Completed ${q.customerName}`)}
                     >
-                      <Check className="h-4 w-4" /> Complete
+                      <Check className="h-3.5 w-3.5" /> Complete
                     </Button>
                   </li>
                 ))}
@@ -144,10 +143,10 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
             )}
           </Card>
 
-          <Card className="overflow-hidden p-5 shadow-sm">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Waiting Queue ({waitingList.length})</h3>
+          <Card className="overflow-hidden p-5 shadow-xs border border-[#E9E1D6] bg-[#FFFDFA] rounded-md">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#74695E]">Waiting Queue ({waitingList.length})</h3>
             {waitingList.length === 0 ? (
-              <p className="rounded-xl bg-muted/40 px-4 py-8 text-center text-sm text-muted-foreground">
+              <p className="rounded-md bg-[#F0EBE3]/50 px-4 py-8 text-center text-xs text-[#74695E]">
                 Queue is empty.
               </p>
             ) : (
@@ -157,24 +156,24 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
                   return (
                     <li
                       key={q.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-sm"
+                      className="flex items-center gap-3 rounded-md border border-[#E9E1D6] bg-[#FFFDFA] p-3 shadow-2xs"
                     >
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-display text-lg font-bold text-primary">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#F0EBE3] text-sm font-bold text-[#A27C48]">
                         {i + 1}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">{q.customerName}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <p className="truncate font-semibold text-sm text-[#302A24]">{q.customerName}</p>
+                        <p className="text-xs text-[#74695E] flex items-center gap-1">
                           {q.isWalkIn ? "Walk-in" : "Booked"} · Waiting {waitDurationMin}m 
                         </p>
                       </div>
                       <Button
                         size="sm"
                         variant="default"
-                        className="gap-1"
+                        className="gap-1 bg-[#A27C48] hover:bg-[#876438] text-white rounded-md text-xs h-8 transition-colors"
                         onClick={run(() => startService(q.appointmentId!), `Serving ${q.customerName}`)}
                       >
-                        <Check className="h-4 w-4" /> Start
+                        <Check className="h-3.5 w-3.5" /> Start
                       </Button>
                     </li>
                   )
@@ -193,10 +192,10 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
           >
             {pending.map((a) => (
               <Row key={a.id} name={a.customerName} sub={`${a.time} · ${serviceNames(a.serviceIds)}`}>
-                <Button size="sm" className="gap-1" onClick={run(() => confirmAppointment(a.id), "Confirmed")}>
-                  <Check className="h-4 w-4" /> Confirm
+                <Button size="sm" className="gap-1 bg-[#A27C48] hover:bg-[#876438] text-white rounded-md text-xs h-8" onClick={run(() => confirmAppointment(a.id), "Confirmed")}>
+                  <Check className="h-3.5 w-3.5" /> Confirm
                 </Button>
-                <Button size="sm" variant="ghost" className="text-rose-500" onClick={run(() => markNoShow(a.id), "Rejected")}>
+                <Button size="sm" variant="ghost" className="text-[#8C3930] hover:bg-[#F7E7E3] rounded-md text-xs h-8" onClick={run(() => markNoShow(a.id), "Rejected")}>
                   Reject
                 </Button>
               </Row>
@@ -206,10 +205,10 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
           <QueueColumn title="Upcoming (Confirmed)" count={confirmed.length} empty="No confirmed bookings.">
             {confirmed.map((a) => (
               <Row key={a.id} name={a.customerName} sub={`${a.time} · ${serviceNames(a.serviceIds)}`}>
-                <Button size="sm" className="gap-1 bg-amber-100 hover:bg-amber-200 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 dark:border-amber-800" onClick={run(() => checkInAppointment(a.id), "Checked in to Live Queue")}>
-                  <UserCheck className="h-4 w-4" /> Move to Live Queue
+                <Button size="sm" className="gap-1 bg-[#F0EBE3] hover:bg-[#E9E1D6] text-[#302A24] border border-[#E9E1D6] rounded-md text-xs h-8" onClick={run(() => checkInAppointment(a.id), "Checked in to Live Queue")}>
+                  <UserCheck className="h-3.5 w-3.5 text-[#A27C48]" /> Move to Live Queue
                 </Button>
-                <Button size="sm" variant="ghost" className="text-rose-500" onClick={run(() => markNoShow(a.id), "No Show")}>
+                <Button size="sm" variant="ghost" className="text-[#8C3930] hover:bg-[#F7E7E3] rounded-md text-xs h-8" onClick={run(() => markNoShow(a.id), "No Show")}>
                   No Show
                 </Button>
               </Row>
@@ -219,27 +218,28 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
       </div>
 
       <Dialog open={walkOpen} onOpenChange={setWalkOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-md border border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Check-In Walk-in</DialogTitle>
-            <DialogDescription>Customer immediately joins the live queue at {BRANCH_LABELS[bid]}.</DialogDescription>
+            <DialogTitle className="font-semibold text-lg text-[#302A24]">Check-In Walk-in</DialogTitle>
+            <DialogDescription className="text-xs text-[#74695E]">Customer immediately joins the live queue at {BRANCH_LABELS[bid]}.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="walk-name">Customer name</Label>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="walk-name" className="text-xs text-[#302A24]">Customer name</Label>
             <Input
               id="walk-name"
               value={walkName}
               onChange={(e) => setWalkName(e.target.value)}
               placeholder="e.g. Walk-in Guest"
               onKeyDown={(e) => e.key === "Enter" && addWalkIn()}
+              className="h-9 text-xs rounded-md border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] focus-visible:ring-[#A27C48]"
               autoFocus
             />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setWalkOpen(false)}>
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" onClick={() => setWalkOpen(false)} className="rounded-md border-[#E9E1D6] text-[#302A24] hover:bg-[#F0EBE3] text-xs">
               Cancel
             </Button>
-            <Button onClick={addWalkIn} disabled={!walkName.trim()}>
+            <Button size="sm" onClick={addWalkIn} disabled={!walkName.trim()} className="rounded-md bg-[#A27C48] hover:bg-[#876438] text-white font-medium text-xs transition-colors">
               Add to Queue
             </Button>
           </DialogFooter>
@@ -247,10 +247,10 @@ export function ReceptionMode({ onExit }: { onExit: () => void }) {
       </Dialog>
 
       <Dialog open={catalogOpen} onOpenChange={setCatalogOpen}>
-        <DialogContent className="max-w-[90vw] w-full max-h-[90vh] overflow-hidden p-0 sm:p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-2xl font-display">Service Catalog</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-w-[90vw] w-full max-h-[90vh] overflow-hidden p-0 rounded-md border border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24]">
+          <DialogHeader className="px-6 pt-6 pb-2 border-b border-[#E9E1D6]">
+            <DialogTitle className="text-xl font-semibold text-[#302A24]">Service Catalog</DialogTitle>
+            <DialogDescription className="text-xs text-[#74695E]">
               Browse all our services. Click arrows or swipe to see more.
             </DialogDescription>
           </DialogHeader>
@@ -275,15 +275,15 @@ function QueueColumn({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="p-4 shadow-sm">
+    <Card className="p-4 shadow-xs border border-[#E9E1D6] bg-[#FFFDFA] rounded-md">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#302A24]">{title}</h3>
+        <span className="rounded-md bg-[#F0EBE3] px-2 py-0.5 text-xs font-semibold text-[#A27C48]">
           {count}
         </span>
       </div>
       {count === 0 ? (
-        <p className="rounded-xl bg-muted/40 px-4 py-5 text-center text-sm text-muted-foreground">{empty}</p>
+        <p className="rounded-md bg-[#F0EBE3]/50 px-4 py-5 text-center text-xs text-[#74695E]">{empty}</p>
       ) : (
         <div className="space-y-2">{children}</div>
       )}
@@ -301,10 +301,10 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card p-3">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-md border border-[#E9E1D6] bg-[#F6F3ED]/30 p-3">
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{name}</p>
-        <p className="truncate text-xs text-muted-foreground">{sub}</p>
+        <p className="truncate font-semibold text-sm text-[#302A24]">{name}</p>
+        <p className="truncate text-xs text-[#74695E]">{sub}</p>
       </div>
       <div className="flex items-center gap-2">{children}</div>
     </div>

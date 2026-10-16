@@ -29,7 +29,7 @@ export function ProfileView() {
   const branchId =
     currentUser.role === "customer"
       ? currentUser.preferredBranch
-      : (currentUser.staffBranch ?? currentUser.ownerBranch ?? "lhasurane");
+      : (currentUser.staffBranch ?? currentUser.ownerBranch ?? "koregaon");
   const branch = getBranch(branchId);
 
   function copyId() {
@@ -81,63 +81,67 @@ export function ProfileView() {
         }
       />
 
-      <Card className="flex flex-col items-center gap-3 p-6 text-center shadow-sm">
-        <UserAvatar name={currentUser.fullName} color={currentUser.avatarColor} className="h-20 w-20 text-2xl" />
+      <Card className="flex flex-col items-center gap-3 p-6 text-center border-[#E9E1D6] bg-[#FFFDFA] shadow-none rounded-none">
+        <UserAvatar name={currentUser.fullName} color={currentUser.avatarColor} className="h-20 w-20 text-2xl border-2 border-[#E9E1D6]" />
         <div>
-          <p className="font-display text-xl font-semibold">{currentUser.fullName}</p>
-          <Badge className="mt-1 bg-primary/10 text-primary" variant="secondary">
-            <ShieldCheck className="mr-1 h-3 w-3" /> {ROLE_LABELS[currentUser.role]}
+          <p className="font-sans text-xl font-semibold text-[#302A24]">{currentUser.fullName}</p>
+          <Badge className="mt-1 bg-[#F0EBE3] text-[#A27C48] border-[#E9E1D6] font-medium" variant="outline">
+            <ShieldCheck className="mr-1 h-3.5 w-3.5" /> {ROLE_LABELS[currentUser.role]}
           </Badge>
         </div>
         <button
           onClick={copyId}
-          className="flex items-center gap-2 rounded-xl border border-dashed border-border px-4 py-2 text-sm transition-colors hover:bg-accent"
+          className="flex items-center gap-2 rounded-none border border-dashed border-[#E9E1D6] bg-[#F6F3ED] px-4 py-2 text-sm transition-colors hover:bg-[#F0EBE3] text-[#302A24]"
         >
           <span className="font-mono font-semibold tracking-wider">{currentUser.id}</span>
-          <Copy className="h-4 w-4 text-muted-foreground" />
+          <Copy className="h-4 w-4 text-[#74695E]" />
         </button>
-        <p className="text-xs text-muted-foreground">{t("profile.permanent_id")}</p>
+        <p className="text-xs text-[#74695E]">{t("profile.permanent_id")}</p>
       </Card>
 
-      <Card className="divide-y divide-border p-0 shadow-sm overflow-hidden">
+      <Card className="divide-y divide-[#E9E1D6] p-0 border-[#E9E1D6] bg-[#FFFDFA] shadow-none rounded-none overflow-hidden">
         {isEditing ? (
           <div className="flex flex-col gap-4 p-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("profile.full_name")}</label>
+              <label className="text-sm font-semibold text-[#5C5B56]">{t("profile.full_name")}</label>
               <Input 
                 value={formData.fullName} 
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} 
-                placeholder={t("profile.full_name")} 
+                placeholder={t("profile.full_name")}
+                className="h-11 text-base bg-[#FFFDFA] border-[#E9E1D6] text-[#222220] focus-visible:ring-[#A27C48] rounded-none" 
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("profile.phone")}</label>
+              <label className="text-sm font-semibold text-[#5C5B56]">{t("profile.phone")}</label>
               <Input 
                 value={formData.phone} 
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })} 
                 placeholder={t("profile.phone")} 
+                className="h-11 text-base bg-[#FFFDFA] border-[#E9E1D6] text-[#222220] focus-visible:ring-[#A27C48] rounded-none"
               />
             </div>
             <div className="space-y-1.5 opacity-70">
-              <label className="text-sm font-medium">{t("profile.email_readonly")}</label>
+              <label className="text-sm font-semibold text-[#5C5B56]">{t("profile.email_readonly")}</label>
               <Input 
                 value={currentUser.email} 
                 disabled 
+                className="h-11 text-base bg-[#F0EBE3] border-[#E9E1D6] text-[#74695E] rounded-none cursor-not-allowed"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("profile.address")}</label>
+              <label className="text-sm font-semibold text-[#5C5B56]">{t("profile.address")}</label>
               <Input 
                 value={formData.address} 
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })} 
                 placeholder={t("profile.address")} 
+                className="h-11 text-base bg-[#FFFDFA] border-[#E9E1D6] text-[#222220] focus-visible:ring-[#A27C48] rounded-none"
               />
             </div>
-            <div className="flex justify-end gap-2 pt-4 mt-2 border-t border-border/50">
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} disabled={saving}>
+            <div className="flex justify-end gap-2.5 pt-4 mt-2 border-t border-[#E9E1D6]">
+              <Button variant="ghost" onClick={() => setIsEditing(false)} disabled={saving} className="rounded-none text-sm text-[#5C5B56] hover:bg-[#F0EBE3] hover:text-[#222220] h-10 px-4">
                 {t("common.cancel")}
               </Button>
-              <Button size="sm" onClick={handleSave} disabled={saving} className="gap-2">
+              <Button onClick={handleSave} disabled={saving} className="gap-2 rounded-none bg-[#A27C48] hover:bg-[#876438] text-white text-sm font-semibold h-10 px-5">
                 <Check className="h-4 w-4" /> {t("common.save")}
               </Button>
             </div>
@@ -148,7 +152,7 @@ export function ProfileView() {
             <Field label="Phone" value={currentUser.phone} />
             <Field label="Email" value={currentUser.email} />
             {currentUser.address && <Field label="Address" value={currentUser.address} />}
-            <Field label="Branch" value={branch.name} />
+            <Field label="Salon" value="Glow & Glamour Hair Studio" />
             {currentUser.role === "staff" && currentUser.staffPosition && (
               <Field label="Position" value={currentUser.staffPosition} />
             )}
@@ -156,19 +160,19 @@ export function ProfileView() {
         )}
       </Card>
 
-      <div className="flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={() => setPwOpen(true)}>
+      <div className="flex gap-3">
+        <Button variant="outline" className="flex-1 rounded-none border-[#E9E1D6] bg-[#FFFDFA] text-[#222220] hover:bg-[#F0EBE3] h-11 text-sm sm:text-base font-semibold" onClick={() => setPwOpen(true)}>
           Change Password
         </Button>
         <Button
           variant="outline"
-          className="flex-1 text-rose-600"
+          className="flex-1 rounded-none border-[#E9E1D6] bg-[#FFFDFA] text-[#8C3930] hover:bg-[#F7E7E3] h-11 text-sm sm:text-base font-semibold"
           onClick={() => {
             logout();
             router.replace("/login");
           }}
         >
-          <LogOut className="h-4 w-4" /> Logout
+          <LogOut className="h-4 w-4 mr-2" /> Logout
         </Button>
       </div>
 
@@ -180,8 +184,8 @@ export function ProfileView() {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between px-5 py-3.5">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="font-medium max-w-[60%] text-right break-words">{value}</span>
+      <span className="text-sm font-semibold text-[#5C5B56]">{label}</span>
+      <span className="font-medium text-base text-[#222220] max-w-[65%] text-right break-words">{value}</span>
     </div>
   );
 }

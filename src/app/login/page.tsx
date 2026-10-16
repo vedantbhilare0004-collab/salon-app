@@ -3,11 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Lock, Eye, EyeOff, Sparkles, CheckCircle2 } from "lucide-react";
+import {
+  Loader2,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  MapPin,
+  ArrowRight,
+} from "lucide-react";
 import { useData } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -25,14 +32,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setMessage("");
-    
+
     if (mode === "reset") {
-      if (!identifier) {
+      if (!identifier.trim()) {
         setError("Please enter your email address.");
         return;
       }
       setLoading(true);
-      const res = await resetPassword(identifier);
+      const res = await resetPassword(identifier.trim());
       setLoading(false);
       if (!res.ok) {
         setError(res.error ?? "Failed to send reset email.");
@@ -42,197 +49,254 @@ export default function LoginPage() {
       return;
     }
 
-    if (!identifier || !password) {
-      setError("Please enter your login and password.");
+    if (!identifier.trim() || !password) {
+      setError("Please enter your login identifier and password.");
       return;
     }
     setLoading(true);
-    const res = await login(identifier, password);
+    const res = await login(identifier.trim(), password);
     setLoading(false);
     if (!res.ok) {
-      setError(res.error ?? "Login failed.");
+      setError(res.error ?? "Login failed. Please check your credentials.");
       return;
     }
     toast.success("Welcome back!");
   }
 
-  const features = [
-    "Online Appointment Booking",
-    "Staff Management",
-    "Loyalty & Membership",
-    "Live Queue Tracking",
-    "Billing & POS"
-  ];
-
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Brand panel (Desktop & Tablet) */}
-      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-primary/90 to-primary p-12 text-primary-foreground md:flex md:w-5/12 lg:w-1/2">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 font-display text-2xl font-bold backdrop-blur">
-            G
-          </div>
-          <div>
-            <p className="font-display text-xl font-semibold">Glow &amp; Glamour</p>
-            <p className="text-xs uppercase tracking-[0.2em] opacity-80">Hair Studio</p>
-          </div>
-        </div>
-        
-        <div className="space-y-8">
-          <Sparkles className="h-10 w-10 opacity-90" />
-          <div className="space-y-4">
-            <h2 className="font-display text-3xl lg:text-4xl font-semibold leading-tight">
-              Beauty, booked beautifully.
-            </h2>
-            <p className="max-w-md text-sm leading-relaxed opacity-90">
-              Two branches, live queues, and a premium salon experience for customers,
-              staff, and owners — all in one elegant app.
-            </p>
-          </div>
-          
-          <div className="space-y-3 pt-4">
-            {features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm font-medium opacity-90">
-                <CheckCircle2 className="h-4 w-4" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <p className="text-xs font-medium tracking-wide opacity-70">Lhasurane · Koregaon</p>
-      </div>
-
-      {/* Form panel */}
-      <div className="flex w-full flex-col items-center justify-center px-6 py-8 pb-8 md:w-7/12 lg:w-1/2">
-        <div className="w-full max-w-[420px] mx-auto flex flex-col items-center md:items-start lg:items-center">
-          
-          {/* Mobile Logo */}
-          <Link href="/" className="flex flex-col items-center gap-3 mb-6 md:hidden">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary font-display text-2xl font-bold text-primary-foreground shadow-sm">
-              G
+    <div className="flex min-h-screen bg-[#F8F5EF] text-[#292724]">
+      {/* 1. Left Editorial Brand Sidebar (Desktop & Large Tablet: ~48% width) */}
+      <aside className="relative hidden w-full lg:flex lg:w-[48%] xl:w-[46%] flex-col justify-between overflow-hidden bg-[#292724] p-10 xl:p-14 text-[#F8F5EF] border-r border-[#38342F] shrink-0">
+        {/* A. Brand Identity Header */}
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center gap-3.5 group">
+            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden border border-[#C2A779]/40 bg-[#1A1917] shadow-xs transition-transform duration-300 group-hover:scale-105 shrink-0">
+              <img
+                src="/pwa-192x192.png"
+                alt="Glow & Glamour Monogram"
+                width={44}
+                height={44}
+                className="w-full h-full object-cover select-none"
+              />
             </div>
-            <div className="text-center">
-              <span className="font-display text-lg font-semibold block">Glow &amp; Glamour</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Hair Studio</span>
+            <div className="leading-tight">
+              <p className="font-heading text-xl font-medium tracking-tight text-[#F8F5EF]">
+                Glow &amp; Glamour
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-[#C2A779] font-medium">
+                HAIR STUDIO &amp; SPA · KOREGAON
+              </p>
             </div>
           </Link>
+        </div>
 
-          <div className="w-full text-center md:text-left lg:text-center mb-6">
-            <h1 className="font-display text-[22px] md:text-[26px] lg:text-[30px] font-semibold tracking-tight text-foreground">
+        {/* B & C. Main Headline & Short Description */}
+        <div className="relative z-10 my-auto py-12 max-w-md space-y-6">
+          <h2 className="font-heading text-4xl lg:text-[44px] xl:text-[50px] font-normal leading-[1.14] text-[#F8F5EF] tracking-tight">
+            Beauty, styled beautifully.
+          </h2>
+          <p className="text-sm lg:text-[15px] leading-relaxed text-[#DCD5CA] font-light">
+            Expert hair care and personalised salon services for everyone, right here in Koregaon.
+          </p>
+        </div>
+
+        {/* D. Location Footer */}
+        <div className="relative z-10 pt-6 border-t border-[#3D3A35] flex items-center gap-2.5 text-xs text-[#DCD5CA]/80">
+          <MapPin className="h-4 w-4 text-[#C2A779] shrink-0" strokeWidth={1.75} />
+          <span className="font-light tracking-wide">
+            Laxmi Nagar, Koregaon, Maharashtra – 415501
+          </span>
+        </div>
+      </aside>
+
+      {/* 2. Right Sign-in Form Panel (~52% width on desktop, 100% on mobile/tablet) */}
+      <main className="flex flex-1 flex-col items-center justify-center px-5 sm:px-8 py-8 sm:py-12 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
+        <div className="w-full max-w-[420px] mx-auto space-y-6 sm:space-y-7">
+          {/* Mobile Brand Identity Header (Visible only on mobile/tablet < lg) */}
+          <div className="flex flex-col items-center text-center lg:hidden mb-1">
+            <Link href="/" className="inline-flex flex-col items-center gap-2.5 group">
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden border border-[#DCD5CA] bg-[#292724] shadow-xs shrink-0 transition-transform group-hover:scale-105">
+                <img
+                  src="/pwa-192x192.png"
+                  alt="Glow & Glamour Monogram"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover select-none"
+                />
+              </div>
+              <div className="leading-tight">
+                <p className="font-heading text-xl font-medium tracking-tight text-[#292724]">
+                  Glow &amp; Glamour
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#766D61] font-medium">
+                  HAIR STUDIO &amp; SPA · KOREGAON
+                </p>
+              </div>
+            </Link>
+          </div>
+
+          {/* Form Header */}
+          <div className="text-center lg:text-left space-y-1.5">
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight text-[#292724]">
               {mode === "reset" ? "Reset Password" : "Welcome Back"}
             </h1>
-            <p className="text-[16px] text-muted-foreground font-medium mt-2 whitespace-pre-line">
-              {mode === "reset" 
-                ? "Enter your email to receive a password reset link." 
-                : "We're glad to see you again.\nSign in to continue."}
+            <p className="text-xs sm:text-sm text-[#766D61] font-light leading-relaxed">
+              {mode === "reset"
+                ? "Enter your email address and we'll send a password recovery link."
+                : "Sign in to manage your appointments, styling preferences, and digital passes."}
             </p>
           </div>
 
-          <form onSubmit={submit} className="w-full space-y-4">
-            <div className="space-y-2">
+          {/* Authentication Form */}
+          <form onSubmit={submit} className="space-y-4 pt-1">
+            {/* Identifier Field */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="identifier"
+                className="text-xs font-semibold text-[#292724] block"
+              >
+                Email, Phone, or User ID
+              </label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                  <Mail className="h-5 w-5" />
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#766D61]/70 pointer-events-none">
+                  <Mail className="h-4 w-4" strokeWidth={1.75} />
                 </div>
                 <Input
                   id="identifier"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Enter your email, phone number or User ID"
+                  placeholder="name@example.com or phone number"
                   autoComplete="username"
-                  className="h-[50px] lg:h-[54px] rounded-[14px] pl-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary border-border/80 bg-background/50 hover:bg-background"
+                  disabled={loading}
+                  className="h-12 rounded-lg pl-10 text-sm border-[#DCD5CA] bg-white shadow-2xs text-[#292724] placeholder:text-[#766D61]/50 focus-visible:ring-1 focus-visible:ring-[#292724] focus-visible:border-[#292724] transition-all"
                 />
               </div>
             </div>
-            
+
+            {/* Password Field (Login Mode Only) */}
             {mode === "login" && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="text-xs font-semibold text-[#292724]"
+                  >
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("reset");
+                      setError("");
+                      setMessage("");
+                    }}
+                    className="text-xs font-medium text-[#766D61] hover:text-[#292724] transition-colors py-0.5"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none">
-                    <Lock className="h-5 w-5" />
+                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#766D61]/70 pointer-events-none">
+                    <Lock className="h-4 w-4" strokeWidth={1.75} />
                   </div>
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder="Enter your account password"
                     autoComplete="current-password"
-                    className="h-[50px] lg:h-[54px] rounded-[14px] pl-11 pr-11 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-150 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary border-border/80 bg-background/50 hover:bg-background"
+                    disabled={loading}
+                    className="h-12 rounded-lg pl-10 pr-11 text-sm border-[#DCD5CA] bg-white shadow-2xs text-[#292724] placeholder:text-[#766D61]/50 focus-visible:ring-1 focus-visible:ring-[#292724] focus-visible:border-[#292724] transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/70 hover:text-foreground transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#766D61]/70 hover:text-[#292724] transition-colors"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                
-                {/* Forgot Password Link */}
-                <div className="flex justify-end pt-2 pb-1">
-                  <button 
-                    type="button" 
-                    onClick={() => setMode("reset")}
-                    className="text-[14px] font-medium text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Forgot Password?
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" strokeWidth={1.75} />
+                    ) : (
+                      <Eye className="h-4 w-4" strokeWidth={1.75} />
+                    )}
                   </button>
                 </div>
               </div>
             )}
 
+            {/* Error & Success Feedback */}
             {error && (
-              <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+              <div
+                role="alert"
+                className="rounded-lg bg-rose-50/90 border border-rose-200 p-3 text-xs font-medium text-rose-700 animate-in fade-in"
+              >
                 {error}
-              </p>
+              </div>
             )}
             {message && (
-              <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+              <div
+                role="status"
+                className="rounded-lg bg-emerald-50/90 border border-emerald-200 p-3 text-xs font-medium text-emerald-800 animate-in fade-in"
+              >
                 {message}
-              </p>
+              </div>
             )}
 
-            <div className={mode === "login" ? "pt-1" : "pt-3"}>
-              <Button 
-                type="submit" 
-                className="h-[52px] lg:h-[56px] w-full rounded-[14px] text-base font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.98] shadow-sm hover:shadow-md disabled:opacity-70 disabled:active:scale-100"
+            {/* Submit Action Button */}
+            <div className="pt-2">
+              <Button
+                type="submit"
                 disabled={loading}
+                className="h-12 w-full rounded-lg bg-[#292724] hover:bg-[#1E1C1A] text-[#F8F5EF] text-xs uppercase tracking-wider font-semibold shadow-xs hover:shadow-sm transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Signing In...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-[#C2A779]" />
+                    {mode === "reset" ? "Sending Link..." : "Signing In..."}
                   </>
+                ) : mode === "reset" ? (
+                  "Send Reset Link"
                 ) : (
-                  mode === "reset" ? "Send Reset Link" : "Sign In"
+                  <>
+                    Sign In <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                  </>
                 )}
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 w-full text-center text-[15px] text-muted-foreground pb-8">
+          {/* Footer Navigation / Switcher Link */}
+          <div className="pt-4 text-center text-xs text-[#766D61] border-t border-[#DCD5CA]/70">
             {mode === "reset" ? (
-              <>
-                Remember your password?{" "}
-                <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary hover:underline transition-all">
+              <p>
+                Remembered your password?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("login");
+                    setError("");
+                    setMessage("");
+                  }}
+                  className="font-semibold text-[#292724] hover:underline underline-offset-4 transition-all ml-1"
+                >
                   Sign in
                 </button>
-              </>
+              </p>
             ) : (
-              <>
-                New here?{" "}
-                <Link href="/register" className="font-semibold text-primary hover:underline transition-all">
+              <p>
+                New client?{" "}
+                <Link
+                  href="/register"
+                  className="font-semibold text-[#292724] hover:underline underline-offset-4 transition-all ml-1"
+                >
                   Create an account
                 </Link>
-              </>
+              </p>
             )}
           </div>
-          
         </div>
-      </div>
+      </main>
     </div>
   );
 }

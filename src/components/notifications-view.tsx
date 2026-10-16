@@ -54,12 +54,12 @@ export function NotificationsView() {
         action={
           <div className="flex flex-wrap items-center gap-2">
             {unread > 0 && (
-              <Button variant="outline" size="sm" onClick={() => markAllNotificationsRead()}>
-                <CheckCheck className="mr-2 h-4 w-4" /> {t("notifications.mark_all")}
+              <Button variant="outline" size="sm" onClick={() => markAllNotificationsRead()} className="rounded-none border-[#E9E1D6] bg-[#FFFDFA] text-[#302A24] hover:bg-[#F0EBE3]">
+                <CheckCheck className="mr-2 h-4 w-4 text-[#A27C48]" /> {t("notifications.mark_all")}
               </Button>
             )}
             {list.length > 0 && (
-              <Button variant="destructive" size="sm" onClick={() => clearAllNotifications()}>
+              <Button variant="outline" size="sm" onClick={() => clearAllNotifications()} className="rounded-none border-[#E9E1D6] bg-[#F7E7E3] text-[#8C3930] hover:bg-[#F7E7E3]/80">
                 <X className="mr-2 h-4 w-4" /> Clear All
               </Button>
             )}
@@ -79,7 +79,7 @@ export function NotificationsView() {
             />
           ))}
           {visibleCount < list.length && (
-            <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-muted-foreground">
+            <div ref={observerRef} className="h-10 flex items-center justify-center text-sm text-[#74695E]">
               Loading more...
             </div>
           )}
@@ -92,33 +92,39 @@ export function NotificationsView() {
 function NotificationRow({ n, onClick, onDelete }: { n: AppNotification; onClick: () => void; onDelete: () => void }) {
   const Icon = ICONS[n.kind] ?? Bell;
   return (
-    <Card className={cn("group flex items-start gap-3 p-4 shadow-sm transition-colors hover:bg-accent/50 cursor-pointer", !n.read && "border-primary/30 bg-primary/5")} onClick={onClick}>
+    <Card 
+      className={cn(
+        "group flex items-start gap-3 p-4 shadow-none rounded-none border border-[#E9E1D6] bg-[#FFFDFA] transition-colors hover:bg-[#F0EBE3]/50 cursor-pointer", 
+        !n.read && "border-[#A27C48]/40 bg-[#F0EBE3]/30"
+      )} 
+      onClick={onClick}
+    >
       <div
         className={cn(
-          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-          !n.read ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-none",
+          !n.read ? "bg-[#A27C48] text-white" : "bg-[#F0EBE3] text-[#74695E]"
         )}
       >
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate font-medium">{n.title}</p>
-          {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
+          <p className="truncate font-medium text-sm text-[#302A24]">{n.title}</p>
+          {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-[#A27C48]" />}
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5">{n.message}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{relativeTime(n.createdAt)}</p>
+        <p className="text-sm text-[#74695E] mt-0.5">{n.message}</p>
+        <p className="mt-1 text-xs text-[#74695E]/80">{relativeTime(n.createdAt)}</p>
       </div>
       <Button 
         variant="ghost" 
         size="icon" 
-        className="h-10 w-10 text-muted-foreground hover:bg-rose-100 hover:text-rose-600 transition-colors shrink-0 self-center"
+        className="h-9 w-9 rounded-none text-[#74695E] hover:bg-[#F7E7E3] hover:text-[#8C3930] transition-colors shrink-0 self-center"
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
       >
-        <Trash2 className="h-5 w-5" />
+        <Trash2 className="h-4 w-4" />
       </Button>
     </Card>
   );

@@ -19,7 +19,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || 'New Notification';
   const notificationOptions = {
     body: payload.notification?.body || 'You have a new update.',
-    icon: '/icon.png', // Fallback icon if none provided
+    icon: '/pwa-192x192.png', // Fallback icon if none provided
+    badge: '/favicon.png',
     data: payload.data
   };
 

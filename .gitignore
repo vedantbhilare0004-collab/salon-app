@@ -117,3 +117,4 @@ $RECYCLE.BIN/
 serviceAccountKey.json
 .env.local
 .env
+.env.vercel

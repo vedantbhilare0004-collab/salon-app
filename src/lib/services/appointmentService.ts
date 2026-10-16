@@ -87,4 +87,50 @@ export const appointmentService = {
       }
     );
   },
+
+  async getByDate(branchId: string, date: string): Promise<Appointment[]> {
+    try {
+      const db = getDb();
+      const q = query(
+        collection(db, "appointments"),
+        where("branchId", "==", branchId),
+        where("date", "==", date)
+      );
+      const { getDocs } = await import("firebase/firestore");
+      const snap = await getDocs(q);
+      return snap.docs.map(d => toAppointment(d.id, d.data() as Record<string, unknown>));
+    } catch {
+      // Permission denied or unauthenticated guest: return empty list to fallback to default slots
+      return [];
+    }
+  },
+
+  async getByReference(reference: string, token?: string): Promise<Appointment | null> {
+    // 1. Try server endpoint first (has admin access and bypasses client permission rules)
+    try {
+      const res = await fetch(`/api/appointments/get-by-reference?reference=${encodeURIComponent(reference)}&token=${encodeURIComponent(token || "")}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.appointment) {
+          return json.appointment as Appointment;
+        }
+      }
+    } catch {
+      // Fallback to client SDK if fetch fails
+    }
+
+    try {
+      const db = getDb();
+      const q = query(
+        collection(db, "appointments"),
+        where("reference", "==", reference)
+      );
+      const { getDocs } = await import("firebase/firestore");
+      const snap = await getDocs(q);
+      if (snap.empty) return null;
+      return toAppointment(snap.docs[0].id, snap.docs[0].data() as Record<string, unknown>);
+    } catch {
+      return null;
+    }
+  },
 };

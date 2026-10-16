@@ -106,15 +106,15 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/70 bg-muted/30 px-6 py-12 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-none border border-dashed border-[#E9E1D6] bg-[#FFFDFA] px-6 py-12 text-center">
       {Icon && (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <div className="flex h-12 w-12 items-center justify-center rounded-none bg-[#F0EBE3] text-[#A27C48]">
           <Icon className="h-6 w-6" />
         </div>
       )}
       <div className="space-y-1">
-        <p className="font-medium">{title}</p>
-        {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
+        <p className="font-medium text-sm text-[#302A24]">{title}</p>
+        {description && <p className="max-w-sm text-xs text-[#74695E]">{description}</p>}
       </div>
       {action}
     </div>
@@ -133,7 +133,7 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-none border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
         statusColor(status)
       )}
     >
@@ -144,7 +144,7 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
 
 export function UserAvatar({
   name,
-  color = "#b08d57",
+  color = "#A27C48",
   className,
 }: {
   name: string;
@@ -152,8 +152,8 @@ export function UserAvatar({
   className?: string;
 }) {
   return (
-    <Avatar className={cn("h-9 w-9", className)}>
-      <AvatarFallback style={{ background: color, color: "#fff" }} className="font-semibold">
+    <Avatar className={cn("h-9 w-9 rounded-none", className)}>
+      <AvatarFallback style={{ background: color, color: "#fff" }} className="font-semibold rounded-none">
         {initials(name)}
       </AvatarFallback>
     </Avatar>

@@ -28,8 +28,7 @@ export default function StaffSchedule() {
     <div className="space-y-6">
       <PageHeader
         title="Schedule"
-        subtitle={`Upcoming roster at ${BRANCH_LABELS[activeBranchId]}`}
-        action={<div className="hidden sm:block"><BranchSwitcher /></div>}
+        subtitle="Upcoming roster and appointments"
       />
 
       <div className="flex gap-2 overflow-x-auto pb-1">
