@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -110,7 +110,7 @@ const ICON_CHOICES = [
   { id: "ShieldCheck", label: "Verified", icon: ShieldCheck },
 ];
 
-export default function OfferStudioPage() {
+function OfferStudioContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const offerId = searchParams.get("id");
@@ -1643,3 +1643,18 @@ export default function OfferStudioPage() {
     </div>
   );
 }
+
+export default function OfferStudioPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#8E6D38] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <OfferStudioContent />
+    </Suspense>
+  );
+}
+

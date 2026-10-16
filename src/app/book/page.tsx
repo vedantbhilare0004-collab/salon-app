@@ -1,8 +1,11 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { BookingFlow } from "@/components/public/booking/booking-flow";
 import { PublicNavbar } from "@/components/public/navbar";
 import { PublicFooter } from "@/components/public/footer";
 import { MapPin } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book an Appointment — Glow & Glamour Hair Studio & Spa",
@@ -31,7 +34,15 @@ export default function BookPage() {
           </div>
 
           {/* Booking Console */}
-          <BookingFlow />
+          <Suspense
+            fallback={
+              <div className="w-full min-h-[400px] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-[#8E6D38] border-t-transparent animate-spin" />
+              </div>
+            }
+          >
+            <BookingFlow />
+          </Suspense>
         </div>
       </main>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { ServiceSelection } from "./steps/service-selection";
 import { StaffSelection } from "./steps/staff-selection";
 import { DateTimeSelection } from "./steps/date-time-selection";
@@ -58,7 +58,7 @@ const STEPS = [
   { id: "details", title: "Your Details", subtitle: "Contact info" },
 ];
 
-export function BookingFlow() {
+function BookingFlowInner() {
   const searchParams = useSearchParams();
   const offerParamId = searchParams?.get("offerId");
   const { offers, services: catalogueServices } = useData();
@@ -763,3 +763,18 @@ export function BookingFlow() {
     </div>
   );
 }
+
+export function BookingFlow() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full min-h-[400px] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#8E6D38] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <BookingFlowInner />
+    </Suspense>
+  );
+}
+
